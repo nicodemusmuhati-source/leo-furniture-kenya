@@ -10,15 +10,15 @@
 <meta property="og:url" content="https://leo-furniture-kenya.netlify.app/">
 <meta property="og:title" content="Leo Furniture · Real Craft. Real Quality. Real Kenyan.">
 <meta property="og:description" content="Wall units, kitchen cabinets, tables, executive couches and interior design. Delivered across Kenya. Order on WhatsApp +254 729 754 199.">
-<meta property="og:image" content="https://leo-furniture-kenya.netlify.app/img/leo-furniture-whatsapp-preview-v2.jpg">
-<meta property="og:image:secure_url" content="https://leo-furniture-kenya.netlify.app/img/leo-furniture-whatsapp-preview-v2.jpg">
+<meta property="og:image" content="https://leo-furniture-kenya.netlify.app/img/leo-furniture-whatsapp-preview-v3.jpg">
+<meta property="og:image:secure_url" content="https://leo-furniture-kenya.netlify.app/img/leo-furniture-whatsapp-preview-v3.jpg">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Leo Furniture logo and name on an oak board, with the slogan Real Craft. Real Quality. Real Kenyan. in carved wooden letters, separated by nails, above a timber rail and a claw hammer.">
+<meta property="og:image:alt" content="Leo Furniture wooden logo (walnut L and golden F, nailed together) and name on an oak board, with the slogan Real Craft. Real Quality. Real Kenyan. in carved wooden letters, separated by nails, above a timber rail and a claw hammer.">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="apple-touch-icon" href="/img/leo-furniture-icon.png">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 200 200%27%3E%3Crect width=%27200%27 height=%27200%27 rx=%2744%27 fill=%27%233b2416%27/%3E%3Cpath d=%27M55 55h30v75h75v30H55z%27 fill=%27%23fff%27/%3E%3Cpath d=%27M91 55h69v24h-45v10h33v21h-33v14H91z%27 fill=%27%23f2a516%27/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="/img/leo-furniture-logo.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
@@ -103,7 +103,7 @@ form{display:grid;gap:12px}
 <body>
 <header class="top">
   <a class="brand" href="#" data-go="home" aria-label="Leo Furniture home">
-    <svg width="40" height="40" viewBox="0 0 200 200" aria-hidden="true"><path d="M30 30 h40 v100 h100 v40 h-140 z" fill="#ffffff"/><path d="M78 30 h92 v32 h-60 v14 h44 v28 h-44 v18 h-32 z" fill="#f2a516"/></svg>
+    <img src="/img/leo-furniture-logo.svg" width="40" height="40" alt="" style="display:block;flex:none">
     <span><b>Leo Furniture</b><small id="tag">Serem · Nandi County · countrywide delivery</small></span>
   </a>
   <button class="cur" id="lang">Kiswahili</button>
@@ -170,7 +170,7 @@ function tabs(){
 }
 
 const V={
-home:()=>`<section class="hero"><img class="board" src="/img/leo-furniture-whatsapp-preview-v2.jpg" width="1200" height="630" alt="Leo Furniture logo and name on an oak board, with the slogan Real Craft. Real Quality. Real Kenyan. in carved wooden letters, separated by nails, above a timber rail and a claw hammer" fetchpriority="high"><div class="htxt"><h1>${L('Furniture made by hand in Serem, delivered across Kenya','Samani zilizotengenezwa kwa mkono Serem, tunafikisha kote Kenya')}</h1>
+home:()=>`<section class="hero"><img class="board" src="/img/leo-furniture-whatsapp-preview-v3.jpg" width="1200" height="630" alt="Leo Furniture wooden logo (walnut L and golden F, nailed together) and name on an oak board, with the slogan Real Craft. Real Quality. Real Kenyan. in carved wooden letters, separated by nails, above a timber rail and a claw hammer" fetchpriority="high"><div class="htxt"><h1>${L('Furniture made by hand in Serem, delivered across Kenya','Samani zilizotengenezwa kwa mkono Serem, tunafikisha kote Kenya')}</h1>
  <p>${L('Wall units, kitchen cabinets, classic tables, executive couches and full interior design by Vincent and the Leo Furniture workshop.','Kabati za ukutani, kabati za jikoni, meza za kifahari, makochi ya kifahari na mapambo kamili ya ndani, kutoka kwa Vincent na karakana ya Leo Furniture.')}</p>
  <div class="btns" style="margin-top:4px"><button class="btn b-acc" data-go="shop">${L('Browse furniture','Angalia samani')}</button><a class="btn b-wa" href="${wa(L('Hello Vincent, I found Leo Furniture on the app and would like to ask about furniture.','Habari Vincent, nimeona Leo Furniture kwenye programu na ningependa kuuliza kuhusu samani.'))}" target="_blank" rel="noopener">${L('WhatsApp Vincent','WhatsApp Vincent')}</a></div></div></section>
  <div class="wrap"><div class="sec"><h2>${L('What we make','Tunachotengeneza')}</h2></div>

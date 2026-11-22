@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Leo Furniture logo: a walnut wood L and a golden wood F, nailed together, on a light board">
+<defs>
+ <pattern id="walV" width="26" height="200" patternUnits="userSpaceOnUse"><rect width="26" height="200" fill="#5b3519"/><path d="M5 0 C2 50 9 100 5 200 M13 0 C16 60 10 120 14 200 M21 0 C19 40 24 130 20 200" stroke="#7a4a26" stroke-width="2.4" fill="none"/><path d="M9 0 C11 70 7 140 10 200 M18 0 C16 90 20 150 17 200" stroke="#3e2410" stroke-width="1.4" fill="none"/></pattern>
+ <pattern id="walH" width="200" height="26" patternUnits="userSpaceOnUse"><rect width="200" height="26" fill="#5b3519"/><path d="M0 5 C50 2 100 9 200 5 M0 13 C60 16 120 10 200 14 M0 21 C40 19 130 24 200 20" stroke="#7a4a26" stroke-width="2.4" fill="none"/><path d="M0 9 C70 11 140 7 200 10 M0 18 C90 16 150 20 200 17" stroke="#3e2410" stroke-width="1.4" fill="none"/></pattern>
+ <pattern id="oakV" width="26" height="200" patternUnits="userSpaceOnUse"><rect width="26" height="200" fill="#e3a33f"/><path d="M5 0 C2 50 9 100 5 200 M14 0 C17 60 11 120 15 200 M21 0 C19 40 24 130 20 200" stroke="#f4c06a" stroke-width="2.4" fill="none"/><path d="M9 0 C11 70 7 140 10 200 M18 0 C16 90 20 150 17 200" stroke="#b97a22" stroke-width="1.5" fill="none"/></pattern>
+ <pattern id="oakH" width="200" height="26" patternUnits="userSpaceOnUse"><rect width="200" height="26" fill="#e3a33f"/><path d="M0 5 C50 2 100 9 200 5 M0 14 C60 17 120 11 200 15 M0 21 C40 19 130 24 200 20" stroke="#f4c06a" stroke-width="2.4" fill="none"/><path d="M0 9 C70 11 140 7 200 10 M0 18 C90 16 150 20 200 17" stroke="#b97a22" stroke-width="1.5" fill="none"/></pattern>
+ <radialGradient id="head" cx=".38" cy=".34" r=".7"><stop offset="0" stop-color="#f6f8f9"/><stop offset=".55" stop-color="#a9b1b7"/><stop offset="1" stop-color="#5f676d"/></radialGradient>
+ <filter id="bevel" x="-10%" y="-10%" width="130%" height="130%"><feDropShadow dx="2" dy="3" stdDeviation="1.6" flood-color="#000" flood-opacity=".45"/></filter>
+ <filter id="ns" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx=".8" dy="1.2" stdDeviation=".6" flood-color="#000" flood-opacity=".55"/></filter>
+ <g id="nail" filter="url(#ns)"><circle r="5" fill="url(#head)" stroke="#4d5459" stroke-width=".8"/><circle cx="-1.4" cy="-1.6" r="1.4" fill="#fff" opacity=".75"/></g>
+</defs>
+<rect width="200" height="200" rx="44" fill="#f1e2c6"/><rect x="6" y="6" width="188" height="188" rx="38" fill="none" stroke="#3b2416" stroke-width="3"/>
+<g filter="url(#bevel)">
+ <rect x="30" y="30" width="40" height="140" fill="url(#walV)"/><rect x="70" y="130" width="100" height="40" fill="url(#walH)"/>
+ <rect x="78" y="30" width="32" height="92" fill="url(#oakV)"/><rect x="110" y="30" width="60" height="32" fill="url(#oakH)"/><rect x="110" y="76" width="44" height="28" fill="url(#oakH)"/></g>
+<path d="M70 130 V170 M110 30 V62 M110 76 V104" stroke="#2a190f" stroke-width="1.4" opacity=".85"/>
+<g fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="1.3"><path d="M31 169 V31 H69"/><path d="M79 121 V31 H169"/></g>
+<use href="#nail" x="50" y="141"/><use href="#nail" x="50" y="159"/>
+<use href="#nail" x="94" y="46"/><use href="#nail" x="94" y="90"/>
+</svg>
