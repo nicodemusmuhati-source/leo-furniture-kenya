@@ -267,7 +267,7 @@ if(fb){
  onSnapshot(query(collection(fb.db,'products'),orderBy('order')),snap=>{
   S.live=true;S.remote=snap.size;
   if(snap.size)S.products=snap.docs.map(d=>({id:d.id,...d.data()}));
-  if(S.view==='manage'){const l=$('#plist');if(l)l.innerHTML=prodRows();const s=$('#seed');if(s)s.hidden=!(isGoogleAdmin()&&S.remote===0)}
+  if(S.view==='manage'){const l=$('#plist');if(l)l.innerHTML=prodRows();const s=$('#seed');if(s)s.hidden=!missingStarters().length}
   else render();
  },()=>{});
  onAuthStateChanged(fb.auth,async u=>{
@@ -299,6 +299,7 @@ async function loadSecurity(){
  const s=$('#sec');if(s)s.innerHTML=secHTML();
 }
 
+const missingStarters=()=>S.remote===0?DEF.slice():DEF.filter(d=>!S.products.some(p=>p.id===d.id));
 const prodRows=()=>S.products.map(p=>`<div class="row"><div><b>${esc(p.name)}</b><div class="muted">${catName(p.cat)}${p.kes?' · KES '+Number(p.kes).toLocaleString('en-KE'):''}</div></div><div class="btns"><button class="btn b-ghost" data-pedit="${p.id}" style="min-height:40px">Edit</button><button class="btn b-ghost" data-pdel="${p.id}" style="min-height:40px">Delete</button></div></div>`).join('')||'<p class="muted">No products yet.</p>';
 
 const secHTML=()=>`<div class="sec"><h2>Security</h2></div>
@@ -335,7 +336,7 @@ V.manage=()=>{
   <p class="note" id="aihint" style="margin:0">Choose a photo first: the name, category and description will be suggested for you. Then add the price.</p>
   <button type="button" class="link" data-aiagain hidden style="justify-self:start;padding-left:0">Suggest again from this photo</button>
   <div class="btns"><button class="btn b-acc">Save product</button><button type="button" class="btn b-ghost" data-pnew>Clear form</button></div></form>
- <div class="sec"><h2>Products</h2><button class="btn b-ghost" id="seed" data-seed ${isGoogleAdmin()&&S.live&&S.remote===0?'':'hidden'}>Load starter products</button></div>
+ <div class="sec"><h2>Products</h2><button class="btn b-ghost" id="seed" data-seed ${missingStarters().length&&S.live?'':'hidden'}>Restore the original photos</button></div>
  <div class="panel" id="plist">${prodRows()}</div>
  <p style="margin:10px 0 0"><button type="button" class="btn b-ghost" data-trall>Add Kiswahili to products that don't have it</button></p>
  ${S.role!=='admin'?`<form class="panel" id="cp" style="margin-top:16px"><h3>Change the owner PIN</h3><label>New PIN (at least 6 digits)<input name="p" type="password" inputmode="numeric" pattern="[0-9]{6,12}" required autocomplete="new-password"></label><label>Repeat new PIN<input name="p2" type="password" inputmode="numeric" pattern="[0-9]{6,12}" required autocomplete="new-password"></label><button class="btn b-wal">Change PIN</button></form>`:''}
@@ -352,7 +353,7 @@ document.addEventListener('click',async e=>{
   else if(d.pedit){const p=S.products.find(x=>x.id===d.pedit),f=$('#pf');S.editing=p.id;f.pid.value=p.id;f.name.value=p.name;f.cat.value=p.cat;f.size.value=p.size||'';f.desc.value=p.desc||'';f.name_sw.value=p.name_sw||'';f.desc_sw.value=p.desc_sw||'';f.kes.value=p.kes||0;$('#ft').textContent='Edit: '+p.name;f.scrollIntoView({behavior:'smooth'})}
   else if(d.pdel){const p=S.products.find(x=>x.id===d.pdel);modal(`<h2>Delete ${esc(p.name)}?</h2><p class="muted">Customers will no longer see it.</p><div class="btns"><button class="btn b-wal" data-preally="${p.id}">Delete</button><button class="btn b-ghost" data-close>Keep</button></div>`)}
   else if(d.preally){const p=S.products.find(x=>x.id===d.preally);closeModal();await deleteDoc(doc(fb.db,'products',d.preally));logAct('deleted',p&&p.name);toast('Product deleted')}
-  else if('seed' in d){busy(true);let i=1;for(const p of DEF){const {id,...rest}=p;await setDoc(doc(fb.db,'products',id),{...rest,order:i++,updatedAt:serverTimestamp(),updatedBy:S.user.uid})}logAct('loaded starter products');busy(false);toast('Starter products loaded')}
+  else if('seed' in d){busy(true);for(const p of missingStarters()){const {id,...rest}=p;await setDoc(doc(fb.db,'products',id),{...rest,order:DEF.indexOf(p)+1,updatedAt:serverTimestamp(),updatedBy:S.user.uid})}logAct('restored original products');busy(false);toast('Original photos restored')}
   else if('pintoggle' in d){await setDoc(doc(fb.db,'config','security'),{pinLoginEnabled:!S.pinOn});logAct(S.pinOn?'paused PIN logins':'turned PIN logins on');await loadSecurity();toast(S.pinOn?'PIN logins are on':'All PIN logins paused')}
   else if(d.eact){await setDoc(doc(fb.db,'editors',d.eact),{active:d.on==='1'},{merge:true});await loadSecurity();toast(d.on==='1'?'Login activated':'Login paused')}
  }catch(err){busy(false);toast(errMsg(err))}
