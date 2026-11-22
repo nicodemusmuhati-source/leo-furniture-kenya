@@ -116,9 +116,9 @@ const FB_CDN='https://www.gstatic.com/firebasejs/13.3.0/';
 // Fraud Defense (reCAPTCHA Enterprise) site key for Firebase App Check (public by design). Needed for the AI photo suggestions.
 const APPCHECK_KEY='6LfhaSwuAAAAAM7Bp-YmtdcBk2iE0o7IzCXpYQdK';
 const CFG={apiKey:"AIzaSyDH0sjRmWis7xKO7X2DQgGpDutXG5Qx1SA",authDomain:"leo-furniture-d0b59.firebaseapp.com",projectId:"leo-furniture-d0b59",storageBucket:"leo-furniture-d0b59.firebasestorage.app",messagingSenderId:"71987051279",appId:"1:71987051279:web:1851d8aa29d5abc9a55c7a"};
-let initializeApp,deleteApp,getAuth,GoogleAuthProvider,signInWithPopup,signInWithEmailAndPassword,signOut,onAuthStateChanged,createUserWithEmailAndPassword,updatePassword,getFirestore,collection,doc,onSnapshot,setDoc,deleteDoc,getDoc,getDocs,addDoc,serverTimestamp,query,orderBy,limit;
+let initializeApp,deleteApp,getAuth,GoogleAuthProvider,signInWithPopup,signInWithEmailAndPassword,signOut,onAuthStateChanged,createUserWithEmailAndPassword,updatePassword,getFirestore,collection,doc,onSnapshot,setDoc,deleteDoc,getDoc,getDocs,addDoc,serverTimestamp,query,orderBy,limit,where,increment;
 if(CFG.apiKey){try{const [a,b,c]=await Promise.all([import('https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js'),import('https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js'),import('https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js')]);
-({initializeApp,deleteApp}=a);({getAuth,GoogleAuthProvider,signInWithPopup,signInWithEmailAndPassword,signOut,onAuthStateChanged,createUserWithEmailAndPassword,updatePassword}=b);({getFirestore,collection,doc,onSnapshot,setDoc,deleteDoc,getDoc,getDocs,addDoc,serverTimestamp,query,orderBy,limit}=c)}catch(e){}}
+({initializeApp,deleteApp}=a);({getAuth,GoogleAuthProvider,signInWithPopup,signInWithEmailAndPassword,signOut,onAuthStateChanged,createUserWithEmailAndPassword,updatePassword}=b);({getFirestore,collection,doc,onSnapshot,setDoc,deleteDoc,getDoc,getDocs,addDoc,serverTimestamp,query,orderBy,limit,where,increment}=c)}catch(e){}}
 // Firebase web settings (public by design; security comes from firestore.rules)
 {
 const PHONE='254729754199', MPESA='0729754199', SHOW_PRICES=true;
@@ -154,7 +154,7 @@ const catName=c=>{const x=CATS.find(x=>x[0]===c)||[,'Other','Nyingine'];return L
 const pic=p=>p.img?`<img src="${p.img}" alt="${esc(PN(p)+' – '+catName(p.cat)+', Leo Furniture, Serem')}" loading="lazy" decoding="async">`:svg(p.cat);
 const wa=t=>`https://wa.me/${PHONE}?text=${encodeURIComponent(t)}`;
 const toast=t=>{const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2200)};
-const card=p=>`<button class="card" data-item="${p.id}"><div class="pic">${pic(p)}</div><div class="bd"><span class="muted">${catName(p.cat)}</span><h3>${esc(PN(p))}</h3><span class="price">${money(p.kes)}</span></div></button>`;
+const card=p=>`<button class="card" data-item="${p.id}"><div class="pic">${pic(p)}</div><div class="bd"><span class="muted">${catName(p.cat)}</span><h3>${esc(PN(p))}</h3><span class="price">${money(p.kes)}</span>${starsLine(p.id)}</div></button>`;
 const listCount=()=>S.list.reduce((a,x)=>a+x.q,0);
 
 function tabs(){
@@ -194,11 +194,11 @@ item:()=>{const p=S.products.find(x=>x.id===S.item);if(!p)return V.shop();
  <span class="muted">${catName(p.cat)}</span><h1 style="font-size:32px">${esc(PN(p))}</h1>
  <span class="price" style="font-size:24px">${money(p.kes)}</span>
  <p style="margin:0">${esc(PD(p))}</p><p class="muted" style="margin:0">${L('Size','Ukubwa')}: ${esc(p.size)} · ${L('Colours, wood and fabric can be changed to your taste.','Rangi, aina ya mbao na kitambaa vinaweza kubadilishwa upendavyo.')}</p>
- <div class="btns"><a class="btn b-wa" href="${wa(msg)}" target="_blank" rel="noopener">${L('Order on WhatsApp','Agiza kwenye WhatsApp')}</a><button class="btn b-acc" data-add="${p.id}">${L('Add to my list','Ongeza kwenye orodha')}</button></div>
+ <div class="btns"><a class="btn b-wa" data-wa="${p.id}" href="${wa(msg)}" target="_blank" rel="noopener">${L('Order on WhatsApp','Agiza kwenye WhatsApp')}</a><button class="btn b-acc" data-add="${p.id}">${L('Add to my list','Ongeza kwenye orodha')}</button></div>
  <div class="panel"><h3>${L('How to pay with M-Pesa','Jinsi ya kulipa kwa M-Pesa')}</h3><ol class="steps">${L(
   `<li>Agree the final price and delivery cost with Vincent on WhatsApp first.</li><li>Open M-PESA → <b>Send Money</b>.</li><li>Enter <b style="white-space:nowrap">${MPESA}</b> (Vincent, Leo Furniture).</li><li>Enter the agreed amount and your PIN.</li><li>Send the M-Pesa confirmation message to Vincent on WhatsApp.</li>`,
   `<li>Kwanza kubaliana na Vincent kwenye WhatsApp bei ya mwisho na gharama ya usafirishaji.</li><li>Fungua M-PESA → <b>Tuma Pesa</b>.</li><li>Weka namba <b style="white-space:nowrap">${MPESA}</b> (Vincent, Leo Furniture).</li><li>Weka kiasi mlichokubaliana na PIN yako.</li><li>Mtumie Vincent ujumbe wa uthibitisho wa M-Pesa kwenye WhatsApp.</li>`)}</ol></div>
- </div></div></div>`},
+ </div></div>${reviewsHTML(p)}</div>`},
 
 list:()=>{const rows=S.list.map(x=>({...x,p:S.products.find(p=>p.id===x.id)})).filter(x=>x.p);
  const tot=rows.reduce((a,x)=>a+(x.p.kes||0)*x.q,0), quote=rows.some(x=>!x.p.kes);
@@ -208,7 +208,7 @@ list:()=>{const rows=S.list.map(x=>({...x,p:S.products.find(p=>p.id===x.id)})).f
  ${rows.length?`<div class="panel">${rows.map(x=>`<div class="row"><div><b>${esc(PN(x.p))}</b><div class="muted">${money(x.p.kes)}</div></div><div class="qty"><button data-q="${x.id}" data-d="-1" aria-label="${L('Less','Punguza')}">−</button><b>${x.q}</b><button data-q="${x.id}" data-d="1" aria-label="${L('More','Ongeza')}">+</button></div></div>`).join('')}
  ${SHOW_PRICES?`<div class="row"><b>${L('Estimated total','Jumla inayokadiriwa')}</b><span class="price">${money(tot)}${quote?' + …':''}</span></div>`:''}</div>
  <p class="muted">${L('Delivery cost depends on your town and is confirmed by Vincent.','Gharama ya usafirishaji inategemea mji wako na huthibitishwa na Vincent.')}</p>
- <div class="btns"><a class="btn b-wa" href="${wa(msg)}" target="_blank" rel="noopener">${L('Send order on WhatsApp','Tuma oda kwenye WhatsApp')}</a><button class="btn b-ghost" data-clear>${L('Clear list','Futa orodha')}</button></div>`
+ <div class="btns"><a class="btn b-wa" data-walist href="${wa(msg)}" target="_blank" rel="noopener">${L('Send order on WhatsApp','Tuma oda kwenye WhatsApp')}</a><button class="btn b-ghost" data-clear>${L('Clear list','Futa orodha')}</button></div>`
  :`<div class="panel"><b>${L('Your list is empty.','Orodha yako iko tupu.')}</b><p class="muted" style="margin:4px 0 12px">${L('Add pieces you like, then send them all to Vincent in one WhatsApp message.','Ongeza bidhaa unazopenda, kisha zitume zote kwa Vincent kwa ujumbe mmoja wa WhatsApp.')}</p><button class="btn b-wal" data-go="shop">${L('Browse furniture','Angalia samani')}</button></div>`}</div>`},
 
 contact:()=>`<div class="wrap"><h1 style="font-size:32px">${L('Talk to Vincent','Ongea na Vincent')}</h1>
@@ -222,6 +222,7 @@ contact:()=>`<div class="wrap"><h1 style="font-size:32px">${L('Talk to Vincent',
  <label>${L('What do you need?','Unahitaji nini?')}<select name="c">${CATS.map(([c])=>`<option>${catName(c)}</option>`).join('')}</select></label>
  <label>${L('Describe it (size, colour, budget)','Elezea (ukubwa, rangi, bajeti)')}<textarea name="d" rows="4"></textarea></label>
  <button class="btn b-wa">${L('Send request on WhatsApp','Tuma ombi kwenye WhatsApp')}</button><p class="note" style="margin:0">${L('This opens WhatsApp with your message ready. Tap send there.','Hii itafungua WhatsApp ujumbe wako ukiwa tayari. Bonyeza tuma huko.')}</p></form>
+ ${fbkHTMLform()}
  </div>`
 };
 
@@ -297,6 +298,7 @@ if(fb){
     }catch(err){await signOut(fb.auth);toast(errMsg(err));return}
    }
    if(isGoogleAdmin())loadSecurity();
+   loadAdmin();
   }
   if(S.view==='manage')render();
  });
@@ -350,6 +352,7 @@ V.manage=()=>{
  <div class="sec"><h2>Products</h2><button class="btn b-ghost" id="seed" data-seed ${missingStarters().length&&S.live?'':'hidden'}>Restore the original photos</button></div>
  <div class="panel" id="plist">${prodRows()}</div>
  <p style="margin:10px 0 0"><button type="button" class="btn b-ghost" data-trall>Add Kiswahili to products that don't have it</button></p>
+ <div id="adminextra">${S.statsHTML+S.revHTML+S.fbkHTML||'<p class="muted">Loading stats, reviews and comments…</p>'}</div>
  ${S.role!=='admin'?`<form class="panel" id="cp" style="margin-top:16px"><h3>Change the owner PIN</h3><label>New PIN (at least 6 digits)<input name="p" type="password" inputmode="numeric" pattern="[0-9]{6,12}" required autocomplete="new-password"></label><label>Repeat new PIN<input name="p2" type="password" inputmode="numeric" pattern="[0-9]{6,12}" required autocomplete="new-password"></label><button class="btn b-wal">Change PIN</button></form>`:''}
  ${isGoogleAdmin()?`<div id="sec">${secHTML()}</div>`:''}</div>`;
 };
@@ -450,6 +453,90 @@ document.addEventListener('click',async e=>{
   t.disabled=true;let n=0;for(const p of todo){t.textContent=`Translating ${++n} of ${todo.length}…`;
    try{const r=await translateSw(p.name,p.desc);await setDoc(doc(fb.db,'products',p.id),{name_sw:String(r.name_sw||'').slice(0,80),desc_sw:String(r.description_sw||'').slice(0,600),updatedAt:serverTimestamp(),updatedBy:S.user.uid},{merge:true})}catch(x){toast(errMsg(x))}}
   logAct('added Kiswahili to products');t.disabled=false;t.textContent="Add Kiswahili to products that don't have it";toast('Kiswahili added')}
+});
+
+/* ===== Stats, reviews and private comments ===== */
+Object.assign(S,{reviews:[],statsHTML:'',revHTML:'',fbkHTML:''});
+const dayId=(d=new Date())=>d.toISOString().slice(0,10);
+const bump=(col,id,field)=>{if(!fb||!increment)return;setDoc(doc(fb.db,col,id),{[field]:increment(1)},{merge:true}).catch(()=>{})};
+const once=k=>{try{if(sessionStorage.getItem(k))return false;sessionStorage.setItem(k,'1')}catch(e){}return true};
+const typing=()=>{const a=document.activeElement;return a&&a.closest&&a.closest('form')&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)};
+const starTxt=n=>'★★★★★'.slice(0,Math.round(n))+'☆☆☆☆☆'.slice(0,5-Math.round(n));
+const revFor=pid=>S.reviews.filter(r=>r.pid===pid);
+const avgFor=pid=>{const r=revFor(pid);return r.length?r.reduce((a,x)=>a+x.stars,0)/r.length:0};
+const starsLine=pid=>{const r=revFor(pid);return r.length?`<span class="muted" style="font-size:14px"><span style="color:#f2a516">${starTxt(avgFor(pid))}</span> ${avgFor(pid).toFixed(1)} (${r.length})</span>`:''};
+const when=t=>t&&t.toDate?t.toDate().toLocaleDateString('en-GB'):'';
+const reviewsHTML=p=>{const r=revFor(p.id).sort((a,b)=>(b.at&&b.at.seconds||0)-(a.at&&a.at.seconds||0));
+ return `<div class="sec"><h2>${L('Customer reviews','Maoni ya wateja')}</h2></div>
+ ${r.length?`<div class="panel">${r.map(x=>`<div class="row" style="display:block"><div><b>${esc(x.name)}</b>${x.town?`<span class="muted"> · ${esc(x.town)}</span>`:''}</div><div style="color:#f2a516" aria-label="${x.stars} / 5">${starTxt(x.stars)}</div><p style="margin:4px 0 0">${esc(x.text)}</p></div>`).join('')}</div>`
+  :`<p class="muted">${L('No reviews yet. Bought this piece? Tell others what you think.','Bado hakuna maoni. Umenunua bidhaa hii? Waambie wengine maoni yako.')}</p>`}
+ <form class="panel" id="rev" data-pid="${p.id}" style="margin-top:12px"><h3>${L('Write a review','Andika maoni')}</h3>
+  <label>${L('Your name','Jina lako')}<input name="n" required maxlength="40" autocomplete="name"></label>
+  <label>${L('Your town (optional)','Mji wako (si lazima)')}<input name="t" maxlength="40"></label>
+  <label>${L('Rating','Alama')}<select name="s">${[5,4,3,2,1].map(n=>`<option value="${n}">${starTxt(n)} (${n})</option>`).join('')}</select></label>
+  <label>${L('Your review','Maoni yako')}<textarea name="x" rows="3" required maxlength="500"></textarea></label>
+  <button class="btn b-acc">${L('Send review','Tuma maoni')}</button>
+  <p class="note" style="margin:0">${L('Reviews appear after Leo Furniture checks them.','Maoni yataonekana baada ya Leo Furniture kuyakagua.')}</p></form>`};
+const fbkHTMLform=()=>`<div class="sec"><h2>${L('Private comments','Maoni ya faragha')}</h2></div>
+ <form class="panel" id="fbk"><p style="margin:0">${L('Ideas, complaints or suggestions? Only the Leo Furniture team will read this.','Una mawazo, malalamiko au mapendekezo? Ni timu ya Leo Furniture pekee itakayosoma ujumbe huu.')}</p>
+  <label>${L('Your name (optional)','Jina lako (si lazima)')}<input name="n" maxlength="40" autocomplete="name"></label>
+  <label>${L('Phone or email, if you want a reply (optional)','Simu au barua pepe, ukitaka kujibiwa (si lazima)')}<input name="c" maxlength="60"></label>
+  <label>${L('Your comment','Maoni yako')}<textarea name="x" rows="4" required maxlength="1000"></textarea></label>
+  <button class="btn b-wal">${L('Send privately','Tuma kwa faragha')}</button></form>`;
+
+if(fb&&where){
+ onSnapshot(query(collection(fb.db,'reviews'),where('status','==','approved')),snap=>{S.reviews=snap.docs.map(d=>({id:d.id,...d.data()}));if(S.view!=='manage'&&!typing())render()},()=>{});
+ if(location.hash!=='#manage'&&once('leo_visit_'+dayId()))bump('visits',dayId(),'n');
+}
+document.addEventListener('click',e=>{
+ const it=e.target.closest('[data-item]');if(it&&once('leo_pv_'+it.dataset.item))bump('pstats',it.dataset.item,'views');
+ const w=e.target.closest('[data-wa]');if(w)bump('pstats',w.dataset.wa,'wa');
+ if(e.target.closest('[data-walist]'))S.list.forEach(x=>bump('pstats',x.id,'wa'));
+},true);
+document.addEventListener('submit',async e=>{
+ const f=e.target;if(f.id!=='rev'&&f.id!=='fbk')return;e.preventDefault();if(!fb){toast(L('Not connected. Please try again later.','Hakuna mtandao. Tafadhali jaribu tena baadaye.'));return}
+ const b=f.querySelector('button');b.disabled=true;
+ try{
+  if(f.id==='rev')await addDoc(collection(fb.db,'reviews'),{pid:f.dataset.pid,name:f.n.value.trim().slice(0,40),town:f.t.value.trim().slice(0,40),stars:parseInt(f.s.value,10),text:f.x.value.trim().slice(0,500),status:'pending',at:serverTimestamp()});
+  else await addDoc(collection(fb.db,'feedback'),{name:f.n.value.trim().slice(0,40),contact:f.c.value.trim().slice(0,60),text:f.x.value.trim().slice(0,1000),at:serverTimestamp()});
+  f.reset();toast(f.id==='rev'?L('Thank you! Your review will appear after it is checked.','Asante! Maoni yako yataonekana baada ya kukaguliwa.'):L('Thank you! Your comment was sent privately.','Asante! Maoni yako yametumwa kwa faragha.'));
+ }catch(x){toast(L('Could not send. Please try again.','Imeshindikana kutuma. Tafadhali jaribu tena.'))}
+ b.disabled=false;
+});
+
+/* admin side */
+async function loadAdmin(){
+ if(!fb||!S.role)return;
+ try{
+  const [vs,ps,pend,appr,fs]=await Promise.all([getDocs(collection(fb.db,'visits')),getDocs(collection(fb.db,'pstats')),
+   getDocs(query(collection(fb.db,'reviews'),where('status','==','pending'))),getDocs(query(collection(fb.db,'reviews'),where('status','==','approved'))),
+   getDocs(query(collection(fb.db,'feedback'),orderBy('at','desc'),limit(50)))]);
+  const v={};vs.docs.forEach(d=>v[d.id]=d.data().n||0);
+  const back=n=>{const d=new Date();d.setDate(d.getDate()-n);return dayId(d)};
+  const sum=n=>{let t=0;for(let i=0;i<n;i++)t+=v[back(i)]||0;return t};
+  const days=[...Array(14)].map((_,i)=>back(13-i)),mx=Math.max(1,...days.map(d=>v[d]||0));
+  const prods=ps.docs.map(d=>({id:d.id,...d.data()})).map(x=>({...x,p:S.products.find(p=>p.id===x.id)})).filter(x=>x.p).sort((a,b)=>(b.views||0)-(a.views||0));
+  S.statsHTML=`<div class="sec"><h2>Stats</h2><button class="link" data-reload-admin>Refresh</button></div>
+  <div class="panel"><div class="cards2" style="grid-template-columns:repeat(auto-fill,minmax(min(100%,120px),1fr))">
+   ${[['Today',v[dayId()]||0],['Last 7 days',sum(7)],['Last 30 days',sum(30)],['All time',Object.values(v).reduce((a,b)=>a+b,0)]].map(([k,n])=>`<div><div class="muted">${k}</div><div class="price" style="font-size:26px">${n.toLocaleString()}</div><div class="muted" style="font-size:13px">visits</div></div>`).join('')}</div>
+   <div style="display:flex;align-items:flex-end;gap:4px;height:90px;margin-top:14px" aria-label="Visits, last 14 days">${days.map(d=>`<div title="${d}: ${v[d]||0}" style="flex:1;background:#f2a516;border-radius:4px 4px 0 0;height:${Math.max(3,Math.round((v[d]||0)/mx*86))}px"></div>`).join('')}</div>
+   <div class="muted" style="font-size:13px;display:flex;justify-content:space-between"><span>${days[0].slice(5)}</span><span>Visits, last 14 days</span><span>today</span></div></div>
+  <div class="panel" style="margin-top:12px"><h3>Product interest</h3>${prods.length?prods.map(x=>`<div class="row"><b>${esc(x.p.name)}</b><span class="muted" style="white-space:nowrap">${x.views||0} views · ${x.wa||0} WhatsApp</span></div>`).join(''):'<p class="muted" style="margin:0">No product views yet.</p>'}</div>`;
+  const revRow=(d,approved)=>{const r=d.data(),p=S.products.find(x=>x.id===r.pid);return `<div class="row" style="display:block"><div><b>${esc(r.name)}</b>${r.town?` · ${esc(r.town)}`:''} <span style="color:#f2a516">${starTxt(r.stars)}</span> <span class="muted">on ${esc(p?p.name:'a removed product')} · ${when(r.at)}</span></div><p style="margin:4px 0 8px">${esc(r.text)}</p><div class="btns">${approved?'':`<button class="btn b-acc" data-rapprove="${d.id}" style="min-height:40px">Approve</button>`}<button class="btn b-ghost" data-rdel="${d.id}" style="min-height:40px">Delete</button></div></div>`};
+  S.revHTML=`<div class="sec"><h2>Reviews waiting for approval (${pend.size})</h2></div><div class="panel">${pend.size?pend.docs.map(d=>revRow(d,false)).join(''):'<p class="muted" style="margin:0">None waiting.</p>'}</div>
+  <details style="margin-top:10px"><summary class="muted" style="cursor:pointer;padding:8px 0">Published reviews (${appr.size})</summary><div class="panel">${appr.size?appr.docs.map(d=>revRow(d,true)).join(''):'<p class="muted" style="margin:0">None yet.</p>'}</div></details>`;
+  S.fbkHTML=`<div class="sec"><h2>Private customer comments (${fs.size})</h2></div><div class="panel">${fs.size?fs.docs.map(d=>{const c=d.data();return `<div class="row" style="display:block"><div><b>${esc(c.name||'Anonymous')}</b>${c.contact?` · ${esc(c.contact)}`:''} <span class="muted">· ${when(c.at)}</span></div><p style="margin:4px 0 8px;white-space:pre-line">${esc(c.text)}</p><button class="btn b-ghost" data-fdel="${d.id}" style="min-height:40px">Delete</button></div>`}).join(''):'<p class="muted" style="margin:0">No comments yet.</p>'}</div>`;
+ }catch(x){S.statsHTML=`<p class="muted">Could not load stats: ${esc(errMsg(x))}</p>`}
+ const a=$('#adminextra');if(a)a.innerHTML=S.statsHTML+S.revHTML+S.fbkHTML;
+}
+document.addEventListener('click',async e=>{
+ const t=e.target.closest('[data-rapprove],[data-rdel],[data-fdel],[data-reload-admin]');if(!t||!fb)return;const d=t.dataset;
+ try{
+  if(d.rapprove){await setDoc(doc(fb.db,'reviews',d.rapprove),{status:'approved'},{merge:true});logAct('approved a review');toast('Review published')}
+  else if(d.rdel){await deleteDoc(doc(fb.db,'reviews',d.rdel));logAct('deleted a review');toast('Review deleted')}
+  else if(d.fdel){await deleteDoc(doc(fb.db,'feedback',d.fdel));toast('Comment deleted')}
+  loadAdmin();
+ }catch(x){toast(errMsg(x))}
 });
 const route=()=>{if(location.hash==='#manage')go('manage')};
 addEventListener('hashchange',route);route();
