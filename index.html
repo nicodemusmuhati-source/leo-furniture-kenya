@@ -62,6 +62,7 @@ button{cursor:pointer}
 .chip{flex:none;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:9px 15px;min-height:44px}
 .chip.on{background:var(--wal);color:#fff;border-color:var(--wal)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:14px}
+.ideas{display:grid;grid-auto-flow:column;grid-auto-columns:min(78%,270px);gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:8px}.ideas .idea{margin:0;scroll-snap-align:start}.ideas .idea .pic img{object-fit:cover!important}@media(min-width:1024px){.ideas{grid-auto-flow:row;grid-template-columns:repeat(3,1fr);overflow:visible}}
 .cards2{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:12px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;text-align:left;color:var(--ink);padding:0}
 .card .pic{aspect-ratio:4/3;background:var(--wal2);overflow:hidden}
@@ -156,6 +157,7 @@ const money=k=>!SHOW_PRICES||!k?L('Ask for price','Uliza bei'):S.cur==='KES'?'KE
 const PN=p=>L(p.name,p.name_sw||p.name), PD=p=>L(p.desc,p.desc_sw||p.desc);
 const catName=c=>{const x=CATS.find(x=>x[0]===c)||[,'Other','Nyingine'];return L(x[1],x[2])};
 const pic=p=>p.img?`<img src="${p.img}" alt="${esc(PN(p)+' – '+catName(p.cat)+', Leo Furniture, Serem')}" loading="lazy" decoding="async">`:svg(p.cat);
+const IDEAS=[['classic-carved-sofa','Classic carved sofa','Kochi la kale la kuchongwa'],['corner-sofa-coffee-table','Corner sofa with wooden coffee table','Kochi la kona na meza ya kahawa ya mbao'],['tv-wall-unit-shelves','TV wall unit with shelves','Kabati la TV ukutani lenye rafu'],['solid-wooden-bed','Solid wooden bed','Kitanda cha mbao'],['kitchen-cabinets-wooden-top','Kitchen cabinets with wooden top','Makabati ya jikoni yenye juu ya mbao'],['built-in-wardrobe','Built-in wardrobe','Kabati la nguo la ukutani'],['wooden-frame-sofa','Wooden-frame sofa and round table','Kochi la fremu ya mbao na meza ya duara'],['bedroom-headboard-bedside-tables','Headboard and bedside tables','Ubao wa kichwa na meza za pembeni'],['white-classic-bed','White classic bed','Kitanda cheupe cha kifahari']];
 const wa=t=>`https://wa.me/${PHONE}?text=${encodeURIComponent(t)}`;
 const toast=t=>{const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2200)};
 const card=p=>`<button class="card" data-item="${p.id}"><div class="pic">${pic(p)}</div><div class="bd"><span class="muted">${catName(p.cat)}</span><h3>${esc(PN(p))}</h3><span class="price">${money(p.kes)}</span>${starsLine(p.id)}</div></button>`;
@@ -179,6 +181,9 @@ home:()=>`<section class="hero"><img class="board" src="/img/leo-furniture-whats
  <div class="sec"><h2>${L('Popular pieces','Bidhaa maarufu')}</h2><button class="link" data-go="shop" data-all>${L('See all','Ona zote')}</button></div>
  <div class="grid">${S.products.slice(0,4).map(card).join('')}</div>
  ${S.products.length>4?`<div style="text-align:center;margin:16px 0 4px"><button class="btn b-acc" data-go="shop" data-all>${L(`See all products (${S.products.length})`,`Ona bidhaa zote (${S.products.length})`)}</button></div>`:''}
+ <div class="sec"><h2>${L('Design ideas','Mawazo ya muundo')}</h2></div>
+ <p class="muted" style="margin:-4px 0 10px">${L('Like a style? Vincent can make a similar piece to order, in your size and colour. These are sample photos for ideas, not pieces from our workshop.','Umependa muundo? Vincent anaweza kukutengenezea kama huu, kwa kipimo na rangi unayotaka. Hizi ni picha za mfano za mawazo, si bidhaa za karakana yetu.')}</p>
+ <div class="ideas">${IDEAS.map(([f,en,sw])=>`<figure class="card idea"><div class="pic"><img src="/img/ideas/${f}.jpg" loading="lazy" decoding="async" alt="${L(en,sw)} (sample photo)"></div><figcaption class="bd"><b>${L(en,sw)}</b><a class="link" href="${wa(L(`Hello Vincent, can you make something like this: ${en}? (Design ideas on the Leo Furniture site)`,`Habari Vincent, unaweza kutengeneza kitu kama hiki: ${sw}? (Mawazo ya muundo kwenye tovuti ya Leo Furniture)`))}" target="_blank" rel="noopener">${L('Ask Vincent about this →','Muulize Vincent →')}</a></figcaption></figure>`).join('')}</div>
  <div class="sec"><h2>${L('We deliver to','Tunafikisha hadi')}</h2></div>
  <div class="panel"><p style="margin:0">${L('Serem · Kapsabet · Kisumu · Kakamega · Eldoret · Nakuru · Nairobi, and anywhere in Kenya. Ask Vincent for the delivery cost to your town.','Serem · Kapsabet · Kisumu · Kakamega · Eldoret · Nakuru · Nairobi, na popote nchini Kenya. Muulize Vincent gharama ya usafirishaji hadi mji wako.')}</p></div>
  </div>`,
