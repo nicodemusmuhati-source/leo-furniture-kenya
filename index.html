@@ -432,7 +432,7 @@ Look at the photo and identify the main furniture piece. Reply with JSON only:
     custom = beds, wardrobes, doors, shelves, school or church furniture and anything else),
  "description": 2 sentences, at most 350 characters, in plain friendly English, describing what a buyer can see: type, style, colour or finish, and features such as glass doors, drawers, carvings, cup holders or turned legs. If it is painted or upholstered, end with "Available in your choice of colour.",
  "name_sw": the same name in simple everyday Kenyan Swahili mixed with English the way Kenyans talk (keep words like "wall unit", "sofa", "TV"),
- "description_sw": the same description in simple everyday Kenyan Swahili mixed with English, short and easy to read (say "fanicha", never "samani"); if painted or upholstered end with "Inapatikana kwa rangi unayopenda."}
+ "description_sw": the same description in simple everyday Kenyan Swahili mixed with English, short and easy to read (keep names short and simple, e.g. "Wall unit ya TV"; drop design details from the name; avoid formal or rare Swahili words Kenyans may misread, such as "tao" or "samani"; say "fanicha"); if painted or upholstered end with "Inapatikana kwa rangi unayopenda."}
 Never mention price, never guess the wood species or exact dimensions. If there is no furniture in the photo, reply {"name":"","category":"custom","description":""}.`;
 async function aiModel(){
  if(aiModels)return aiModels;
@@ -464,7 +464,7 @@ document.addEventListener('click',e=>{if(e.target.closest('[data-aiagain]')&&las
 
 async function translateSw(name,desc){
  const models=await aiModel();let err=null;
- const prompt=`Translate this furniture product listing from a Kenyan furniture shop into simple everyday Kenyan Swahili mixed with English the way Kenyans talk, as a Kenyan shop would write it. Say "fanicha", never "samani". Keep loan words Kenyans commonly use (like "wall unit", "sofa", "TV") where they are clearer. Reply with JSON only: {"name_sw": "...", "description_sw": "..."}.
+ const prompt=`Translate this furniture product listing from a Kenyan furniture shop into simple everyday Kenyan Swahili mixed with English the way Kenyans talk, as a Kenyan shop would write it. Keep names short and simple, e.g. "Wall unit ya TV". Avoid formal or rare Swahili words Kenyans may misread, such as "tao" or "samani"; say "fanicha". Keep loan words Kenyans commonly use (like "wall unit", "sofa", "TV") where they are clearer. Reply with JSON only: {"name_sw": "...", "description_sw": "..."}.
 Name: ${name}
 Description: ${desc||''}`;
  for(const md of models){try{const r=await md.generateContent(prompt);return JSON.parse(r.response.text().replace(/^```(json)?|```$/g,'').trim())}catch(x){err=x}}
