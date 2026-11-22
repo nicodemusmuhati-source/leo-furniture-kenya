@@ -344,7 +344,11 @@ V.manage=()=>{
   <label>Name in Kiswahili<input name="name_sw" maxlength="80"></label>
   <label>Description in Kiswahili<textarea name="desc_sw" rows="3" maxlength="600"></textarea></label>
   <button type="button" class="link" data-aitr style="justify-self:start;padding-left:0">Translate English to Kiswahili</button>
-  <label>Price in KES (0 = customers see "Ask for price")<input name="kes" type="number" min="0" step="500" inputmode="numeric" value="0"></label>
+  <fieldset style="border:1.5px solid var(--line);border-radius:12px;padding:10px 14px;margin:0;display:grid;gap:8px"><legend style="font-weight:600;font-size:15px;padding:0 6px">Price</legend>
+   <label style="display:flex;align-items:center;gap:10px;font-weight:400"><input type="radio" name="pmode" value="ask" checked style="width:22px;height:22px">Ask for price <span class="muted">(customers ask on WhatsApp)</span></label>
+   <label style="display:flex;align-items:center;gap:10px;font-weight:400"><input type="radio" name="pmode" value="set" style="width:22px;height:22px">Show this price</label>
+   <label>Price in KES<input name="kes" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g. 45,000" disabled></label>
+  </fieldset>
   <label>Photo<input name="img" type="file" accept="image/*"></label>
   <p class="note" id="aihint" style="margin:0">Choose a photo first: the name, category and description will be suggested for you. Then add the price.</p>
   <button type="button" class="link" data-aiagain hidden style="justify-self:start;padding-left:0">Suggest again from this photo</button>
@@ -364,7 +368,7 @@ document.addEventListener('click',async e=>{
   if('gin' in d){await signInWithPopup(fb.auth,new GoogleAuthProvider())}
   else if('sout' in d){await signOut(fb.auth);S.editing=null;render()}
   else if('pnew' in d){S.editing=null;$('#pf').reset();$('#pf').pid.value='';$('#ft').textContent='Add a product'}
-  else if(d.pedit){const p=S.products.find(x=>x.id===d.pedit),f=$('#pf');S.editing=p.id;f.pid.value=p.id;f.name.value=p.name;f.cat.value=p.cat;f.size.value=p.size||'';f.desc.value=p.desc||'';f.name_sw.value=p.name_sw||'';f.desc_sw.value=p.desc_sw||'';f.kes.value=p.kes||0;$('#ft').textContent='Edit: '+p.name;f.scrollIntoView({behavior:'smooth'})}
+  else if(d.pedit){const p=S.products.find(x=>x.id===d.pedit),f=$('#pf');S.editing=p.id;f.pid.value=p.id;f.name.value=p.name;f.cat.value=p.cat;f.size.value=p.size||'';f.desc.value=p.desc||'';f.name_sw.value=p.name_sw||'';f.desc_sw.value=p.desc_sw||'';setPriceForm(f,p.kes||0);$('#ft').textContent='Edit: '+p.name;f.scrollIntoView({behavior:'smooth'})}
   else if(d.pdel){const p=S.products.find(x=>x.id===d.pdel);modal(`<h2>Delete ${esc(p.name)}?</h2><p class="muted">Customers will no longer see it.</p><div class="btns"><button class="btn b-wal" data-preally="${p.id}">Delete</button><button class="btn b-ghost" data-close>Keep</button></div>`)}
   else if(d.preally){const p=S.products.find(x=>x.id===d.preally);closeModal();await deleteDoc(doc(fb.db,'products',d.preally));logAct('deleted',p&&p.name);toast('Product deleted')}
   else if('seed' in d){busy(true);for(const p of missingStarters()){const {id,...rest}=p;await setDoc(doc(fb.db,'products',id),{...rest,order:DEF.indexOf(p)+1,updatedAt:serverTimestamp(),updatedBy:S.user.uid})}logAct('restored original products');busy(false);toast('Original photos restored')}
@@ -377,10 +381,11 @@ document.addEventListener('submit',async e=>{
  try{busy(true);
   if(f.id==='pinf'){let u='owner';try{const L=await getDoc(doc(fb.db,'public','login'));if(L.exists()&&L.data().pinUser)u=L.data().pinUser}catch(x){}await signInWithEmailAndPassword(fb.auth,`${u}@${DOMAIN}`,f.p.value)}
   else if(f.id==='pf'){
+   if(f.pmode.value==='set'&&!(priceFromForm(f)>0)){toast('Type the price in KES, e.g. 45,000, or choose Ask for price');f.kes.focus();return}
    const id=f.pid.value||('p'+Date.now().toString(36)),old=S.products.find(p=>p.id===id&&f.pid.value);
    let img=old&&old.img||'';if(f.img.files[0])img=await shrink(f.img.files[0]);
    if((!f.name_sw.value.trim()||!f.desc_sw.value.trim())&&f.name.value.trim()){try{const t=await translateSw(f.name.value,f.desc.value);if(!f.name_sw.value.trim())f.name_sw.value=t.name_sw||'';if(!f.desc_sw.value.trim())f.desc_sw.value=t.description_sw||''}catch(x){}}
-   const data={name:f.name.value.trim(),name_sw:f.name_sw.value.trim().slice(0,80),desc_sw:f.desc_sw.value.trim().slice(0,600),cat:f.cat.value,desc:f.desc.value.trim(),size:f.size.value.trim(),kes:+f.kes.value||0,img,order:old&&typeof old.order==='number'?old.order:-Date.now(),updatedAt:serverTimestamp(),updatedBy:S.user.uid};
+   const data={name:f.name.value.trim(),name_sw:f.name_sw.value.trim().slice(0,80),desc_sw:f.desc_sw.value.trim().slice(0,600),cat:f.cat.value,desc:f.desc.value.trim(),size:f.size.value.trim(),kes:priceFromForm(f),img,order:old&&typeof old.order==='number'?old.order:-Date.now(),updatedAt:serverTimestamp(),updatedBy:S.user.uid};
    await setDoc(doc(fb.db,'products',id),data);logAct(old?'edited':'added',data.name);
    S.editing=null;f.reset();f.pid.value='';$('#ft').textContent='Add a product';toast(old?'Product updated':'Product added')}
   else if(f.id==='nf'){
@@ -538,6 +543,12 @@ document.addEventListener('click',async e=>{
   loadAdmin();
  }catch(x){toast(errMsg(x))}
 });
+
+const priceFromForm=f=>f.pmode.value==='set'?(parseInt(String(f.kes.value).replace(/[^0-9]/g,''),10)||0):0;
+function setPriceForm(f,k){f.pmode.value=k>0?'set':'ask';f.kes.disabled=!(k>0);f.kes.value=k>0?Number(k).toLocaleString('en-KE'):''}
+document.addEventListener('change',e=>{const el=e.target;if(el.name==='pmode'&&el.form&&el.form.id==='pf'){const f=el.form;f.kes.disabled=f.pmode.value!=='set';if(!f.kes.disabled)f.kes.focus();else f.kes.value=''}});
+document.addEventListener('input',e=>{const el=e.target;if(el.name==='kes'&&el.form&&el.form.id==='pf'){const d=el.value.replace(/[^0-9]/g,'');el.value=d?Number(d).toLocaleString('en-KE'):''}});
+document.addEventListener('reset',e=>{const f=e.target;if(f.id==='pf')setTimeout(()=>{f.kes.disabled=true;f.kes.value=''},0)});
 const route=()=>{if(location.hash==='#manage')go('manage')};
 addEventListener('hashchange',route);route();
 
