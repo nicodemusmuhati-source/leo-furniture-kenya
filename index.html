@@ -101,7 +101,7 @@ form{display:grid;gap:12px}
 
 <script type="module">
 const FB_CDN='https://www.gstatic.com/firebasejs/13.3.0/';
-// reCAPTCHA site key for Firebase App Check (public by design). Needed for the AI photo suggestions.
+// Fraud Defense (reCAPTCHA Enterprise) site key for Firebase App Check (public by design). Needed for the AI photo suggestions.
 const APPCHECK_KEY='6LfhaSwuAAAAAM7Bp-YmtdcBk2iE0o7IzCXpYQdK';
 const CFG={apiKey:"AIzaSyDH0sjRmWis7xKO7X2DQgGpDutXG5Qx1SA",authDomain:"leo-furniture-d0b59.firebaseapp.com",projectId:"leo-furniture-d0b59",storageBucket:"leo-furniture-d0b59.firebasestorage.app",messagingSenderId:"71987051279",appId:"1:71987051279:web:1851d8aa29d5abc9a55c7a"};
 let initializeApp,deleteApp,getAuth,GoogleAuthProvider,signInWithPopup,signInWithEmailAndPassword,signOut,onAuthStateChanged,createUserWithEmailAndPassword,updatePassword,getFirestore,collection,doc,onSnapshot,setDoc,deleteDoc,getDoc,getDocs,addDoc,serverTimestamp,query,orderBy,limit;
@@ -243,7 +243,7 @@ $('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()})
 const ADMIN='nicodemusmuhati@gmail.com', DOMAIN='users.leofurniture.app';
 let fb=null;
 if(CFG.apiKey&&initializeApp){const fapp=initializeApp(CFG);fb={app:fapp,auth:getAuth(fapp),db:getFirestore(fapp)};
- if(APPCHECK_KEY)import(FB_CDN+'firebase-app-check.js').then(ac=>ac.initializeAppCheck(fapp,{provider:new ac.ReCaptchaV3Provider(APPCHECK_KEY),isTokenAutoRefreshEnabled:true})).catch(()=>{})}
+ if(APPCHECK_KEY)import(FB_CDN+'firebase-app-check.js').then(ac=>ac.initializeAppCheck(fapp,{provider:new ac.ReCaptchaEnterpriseProvider(APPCHECK_KEY),isTokenAutoRefreshEnabled:true})).catch(()=>{})}
 Object.assign(S,{user:null,role:null,live:false,remote:0,pinOn:null,editors:[],logs:[],editing:null,busy:false});
 const isGoogleAdmin=()=>S.role==='admin';
 const label=()=>S.user?(S.user.email&&S.user.email.endsWith('@'+DOMAIN)?'Owner PIN':S.user.email):'';
