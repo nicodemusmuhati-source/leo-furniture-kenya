@@ -100,9 +100,12 @@ form{display:grid;gap:12px}
 <div class="modal" id="modal"><div class="panel" id="mbody"></div></div>
 
 <script type="module">
+const FB_CDN='https://www.gstatic.com/firebasejs/13.3.0/';
+// reCAPTCHA site key for Firebase App Check (public by design). Needed for the AI photo suggestions.
+const APPCHECK_KEY='';
 const CFG={apiKey:"AIzaSyDH0sjRmWis7xKO7X2DQgGpDutXG5Qx1SA",authDomain:"leo-furniture-d0b59.firebaseapp.com",projectId:"leo-furniture-d0b59",storageBucket:"leo-furniture-d0b59.firebasestorage.app",messagingSenderId:"71987051279",appId:"1:71987051279:web:1851d8aa29d5abc9a55c7a"};
 let initializeApp,deleteApp,getAuth,GoogleAuthProvider,signInWithPopup,signInWithEmailAndPassword,signOut,onAuthStateChanged,createUserWithEmailAndPassword,updatePassword,getFirestore,collection,doc,onSnapshot,setDoc,deleteDoc,getDoc,getDocs,addDoc,serverTimestamp,query,orderBy,limit;
-if(CFG.apiKey){try{const [a,b,c]=await Promise.all([import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js'),import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js'),import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js')]);
+if(CFG.apiKey){try{const [a,b,c]=await Promise.all([import('https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js'),import('https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js'),import('https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js')]);
 ({initializeApp,deleteApp}=a);({getAuth,GoogleAuthProvider,signInWithPopup,signInWithEmailAndPassword,signOut,onAuthStateChanged,createUserWithEmailAndPassword,updatePassword}=b);({getFirestore,collection,doc,onSnapshot,setDoc,deleteDoc,getDoc,getDocs,addDoc,serverTimestamp,query,orderBy,limit}=c)}catch(e){}}
 // Firebase web settings (public by design; security comes from firestore.rules)
 {
@@ -239,7 +242,8 @@ $('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()})
 /* ===== Secure management (Firebase) ===== */
 const ADMIN='nicodemusmuhati@gmail.com', DOMAIN='users.leofurniture.app';
 let fb=null;
-if(CFG.apiKey&&initializeApp){const fapp=initializeApp(CFG);fb={app:fapp,auth:getAuth(fapp),db:getFirestore(fapp)}}
+if(CFG.apiKey&&initializeApp){const fapp=initializeApp(CFG);fb={app:fapp,auth:getAuth(fapp),db:getFirestore(fapp)};
+ if(APPCHECK_KEY)import(FB_CDN+'firebase-app-check.js').then(ac=>ac.initializeAppCheck(fapp,{provider:new ac.ReCaptchaV3Provider(APPCHECK_KEY),isTokenAutoRefreshEnabled:true})).catch(()=>{})}
 Object.assign(S,{user:null,role:null,live:false,remote:0,pinOn:null,editors:[],logs:[],editing:null,busy:false});
 const isGoogleAdmin=()=>S.role==='admin';
 const label=()=>S.user?(S.user.email&&S.user.email.endsWith('@'+DOMAIN)?'Owner PIN':S.user.email):'';
@@ -323,6 +327,8 @@ V.manage=()=>{
   <label>Description<textarea name="desc" rows="3" maxlength="600"></textarea></label>
   <label>Price in KES (hidden from customers for now; 0 = ask for price)<input name="kes" type="number" min="0" step="500" inputmode="numeric" value="0"></label>
   <label>Photo<input name="img" type="file" accept="image/*"></label>
+  <p class="note" id="aihint" style="margin:0">Choose a photo first: the name, category and description will be suggested for you. Then add the price.</p>
+  <button type="button" class="link" data-aiagain hidden style="justify-self:start;padding-left:0">Suggest again from this photo</button>
   <div class="btns"><button class="btn b-acc">Save product</button><button type="button" class="btn b-ghost" data-pnew>Clear form</button></div></form>
  <div class="sec"><h2>Products</h2><button class="btn b-ghost" id="seed" data-seed ${isGoogleAdmin()&&S.live&&S.remote===0?'':'hidden'}>Load starter products</button></div>
  <div class="panel" id="plist">${prodRows()}</div>
@@ -367,6 +373,45 @@ document.addEventListener('submit',async e=>{
   else if(f.id==='cp'){if(f.p.value!==f.p2.value)throw {code:'x',m:'The two PINs do not match.'};await updatePassword(fb.auth.currentUser,f.p.value);logAct('changed own PIN');f.reset();toast('PIN changed')}
  }catch(err){toast(err&&err.m||errMsg(err))}finally{busy(false)}
 });
+
+/* ===== AI photo suggestions (Gemini via Firebase AI Logic) ===== */
+let aiModels=null,lastPhoto=null;
+const AI_PROMPT=`You help Leo Furniture, a furniture workshop in Serem, Kenya, list products in its online shop.
+Look at the photo and identify the main furniture piece. Reply with JSON only:
+{"name": short product name a Kenyan furniture shop would use, 2 to 6 words, sentence case (e.g. "Classic coffee table", "Arched TV wall unit", "7-seater L-shaped sofa"),
+ "category": exactly one of "wall","kitchen","table","coffee","couch","interior","custom"
+   (wall = TV wall units and display cabinets; kitchen = kitchen cabinets; table = dining tables, office desks and other big tables;
+    coffee = coffee tables and side tables; couch = sofas, couches and armchairs; interior = a finished room or interior design work;
+    custom = beds, wardrobes, doors, shelves, school or church furniture and anything else),
+ "description": 2 sentences, at most 350 characters, in plain friendly English, describing what a buyer can see: type, style, colour or finish, and features such as glass doors, drawers, carvings, cup holders or turned legs. If it is painted or upholstered, end with "Available in your choice of colour."}
+Never mention price, never guess the wood species or exact dimensions. If there is no furniture in the photo, reply {"name":"","category":"custom","description":""}.`;
+async function aiModel(){
+ if(aiModels)return aiModels;
+ const m=await import(FB_CDN+'firebase-ai.js');
+ const ai=m.getAI(fb.app,{backend:new m.GoogleAIBackend()});
+ const cfg={generationConfig:{responseMimeType:'application/json',temperature:0.3}};
+ aiModels=[m.getGenerativeModel(ai,{model:'gemini-3.6-flash',...cfg}),m.getGenerativeModel(ai,{model:'gemini-2.5-flash',...cfg})];
+ return aiModels;
+}
+async function suggestFromPhoto(file){
+ const f=$('#pf'),hint=$('#aihint'),again=document.querySelector('[data-aiagain]');if(!f||!hint)return;
+ lastPhoto=file;hint.textContent='Looking at the photo…';
+ try{
+  const url=await shrink(file),part={inlineData:{data:url.split(',')[1],mimeType:'image/jpeg'}};
+  const models=await aiModel();let out=null,err=null;
+  for(const md of models){try{const r=await md.generateContent([AI_PROMPT,part]);out=JSON.parse(r.response.text().replace(/^```(json)?|```$/g,'').trim());break}catch(x){err=x}}
+  if(!out)throw err;
+  if(!out.name){hint.textContent='No furniture recognised in this photo. Please type the details.';return}
+  const fill=(el,v)=>{if(v&&(!el.value.trim()||el.dataset.ai==='1')){el.value=String(v).slice(0,el.maxLength>0?el.maxLength:600);el.dataset.ai='1'}};
+  fill(f.name,out.name);fill(f.desc,out.description);
+  if(CATS.some(c=>c[0]===out.category)&&(f.cat.dataset.ai==='1'||!f.pid.value)){f.cat.value=out.category;f.cat.dataset.ai='1'}
+  hint.textContent='✨ Suggested from the photo. Check the name and description, change anything that is wrong, then add the price.';
+  if(again)again.hidden=false;
+ }catch(x){hint.textContent='Could not suggest details right now. Please type them yourself.';if(again)again.hidden=false}
+}
+document.addEventListener('change',e=>{const el=e.target;if(el.name==='img'&&el.closest('#pf')&&el.files[0]&&fb)suggestFromPhoto(el.files[0])});
+document.addEventListener('input',e=>{const el=e.target;if(el.closest&&el.closest('#pf')&&el.dataset.ai)delete el.dataset.ai});
+document.addEventListener('click',e=>{if(e.target.closest('[data-aiagain]')&&lastPhoto){const f=$('#pf');['name','desc'].forEach(k=>{if(f[k].dataset.ai==='1')f[k].value=''});f.cat.dataset.ai='1';suggestFromPhoto(lastPhoto)}});
 const route=()=>{if(location.hash==='#manage')go('manage')};
 addEventListener('hashchange',route);route();
 
