@@ -158,6 +158,10 @@ const PN=p=>L(p.name,p.name_sw||p.name), PD=p=>L(p.desc,p.desc_sw||p.desc);
 const catName=c=>{const x=CATS.find(x=>x[0]===c)||[,'Other','Nyingine'];return L(x[1],x[2])};
 const pic=p=>p.img?`<img src="${p.img}" alt="${esc(PN(p)+' – '+catName(p.cat)+', Leo Furniture, Serem')}" loading="lazy" decoding="async">`:svg(p.cat);
 const IDEAS=[['wooden-dining-set-six-chairs','Wooden dining table with six chairs','Meza ya chakula ya mbao na viti sita'],['classic-carved-sofa','Classic carved sofa','Kochi la kale la kuchongwa'],['corner-sofa-coffee-table','Corner sofa with wooden coffee table','Kochi la kona na meza ya kahawa ya mbao'],['tv-wall-unit-shelves','TV wall unit with shelves','Kabati la TV ukutani lenye rafu'],['solid-wooden-bed','Solid wooden bed','Kitanda cha mbao'],['kitchen-cabinets-wooden-top','Kitchen cabinets with wooden top','Makabati ya jikoni yenye juu ya mbao'],['built-in-wardrobe','Built-in wardrobe','Kabati la nguo la ukutani'],['wooden-frame-sofa','Wooden-frame sofa and round table','Kochi la fremu ya mbao na meza ya duara'],['bedroom-headboard-bedside-tables','Headboard and bedside tables','Ubao wa kichwa na meza za pembeni'],['white-classic-bed','White classic bed','Kitanda cheupe cha kifahari'],['classic-dining-room-cabinets','Classic dining set and display cabinets','Seti ya chakula ya kifahari na makabati ya vyombo'],['four-poster-bedroom','Four-poster bed (we make it in wood)','Kitanda cha nguzo nne (tunakitengeneza kwa mbao)']];
+// WhatsApp messages: always Swahili for Vincent; on the English site, a short English copy is added for the customer
+const W=(sw,en,tail='')=>S.lang==='sw'?sw+tail:sw+'\n('+en+')'+tail;
+const KES=k=>'KES '+Number(k).toLocaleString('en-KE');
+const catSw=c=>(CATS.find(x=>x[0]===c)||[c,c,c])[2], catEn=c=>(CATS.find(x=>x[0]===c)||[c,c,c])[1];
 const wa=t=>`https://wa.me/${PHONE}?text=${encodeURIComponent(t)}`;
 const toast=t=>{const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2200)};
 const card=p=>`<button class="card" data-item="${p.id}"><div class="pic">${pic(p)}</div><div class="bd"><span class="muted">${catName(p.cat)}</span><h3>${esc(PN(p))}</h3><span class="price">${money(p.kes)}</span>${starsLine(p.id)}</div></button>`;
@@ -175,7 +179,7 @@ document.documentElement.lang=S.lang;
 const V={
 home:()=>`<section class="hero"><img class="board" src="/img/leo-furniture-whatsapp-preview-v5.jpg" width="1200" height="630" alt="Leo Furniture wooden logo (walnut L and golden F, nailed together) and name with the slogan Real Craft. Real Quality. Real Kenyan., on an oak board above a nailed timber rail" fetchpriority="high"><div class="htxt"><h1>${L('Furniture made by hand in Serem, delivered across Kenya','Samani zilizotengenezwa kwa mkono Serem, tunafikisha kote Kenya')}</h1>
  <p>${L('Wall units, kitchen cabinets, classic tables, executive couches and full interior design by Vincent and the Leo Furniture workshop.','Kabati za ukutani, kabati za jikoni, meza za kifahari, makochi ya kifahari na mapambo kamili ya ndani, kutoka kwa Vincent na karakana ya Leo Furniture.')}</p>
- <div class="btns" style="margin-top:4px"><button class="btn b-acc" data-go="shop" data-all>${L('Browse furniture','Angalia samani')}</button><a class="btn b-wa" href="${wa(L('Hello Vincent, I found Leo Furniture on the app and would like to ask about furniture.','Habari Vincent, nimeona Leo Furniture kwenye programu na ningependa kuuliza kuhusu samani.'))}" target="_blank" rel="noopener">${L('WhatsApp Vincent','WhatsApp Vincent')}</a></div></div></section>
+ <div class="btns" style="margin-top:4px"><button class="btn b-acc" data-go="shop" data-all>${L('Browse furniture','Angalia samani')}</button><a class="btn b-wa" href="${wa(W('Habari Vincent, nimeona Leo Furniture kwenye tovuti na ningependa kuuliza kuhusu samani.','Hello Vincent, I found Leo Furniture online and would like to ask about furniture.'))}" target="_blank" rel="noopener">${L('WhatsApp Vincent','WhatsApp Vincent')}</a></div></div></section>
  <div class="wrap"><div class="sec"><h2>${L('What we make','Tunachotengeneza')}</h2></div>
  <div class="cards2 cats">${CATS.map(([c])=>`<button class="cat" data-cat="${c}"><svg viewBox="40 30 240 150">${ART[c]}</svg><b>${catName(c)}</b></button>`).join('')}</div>
  <div class="sec"><h2>${L('Popular pieces','Bidhaa maarufu')}</h2><button class="link" data-go="shop" data-all>${L('See all','Ona zote')}</button></div>
@@ -183,7 +187,7 @@ home:()=>`<section class="hero"><img class="board" src="/img/leo-furniture-whats
  ${S.products.length>4?`<div style="text-align:center;margin:16px 0 4px"><button class="btn b-acc" data-go="shop" data-all>${L(`See all products (${S.products.length})`,`Ona bidhaa zote (${S.products.length})`)}</button></div>`:''}
  <div class="sec"><h2>${L('Design ideas','Mawazo ya muundo')}</h2></div>
  <p class="muted" style="margin:-4px 0 10px">${L('Like a style? Vincent can make a similar piece to order, in your size and colour. These are sample photos for ideas, not pieces from our workshop.','Umependa muundo? Vincent anaweza kukutengenezea kama huu, kwa kipimo na rangi unayotaka. Hizi ni picha za mfano za mawazo, si bidhaa za karakana yetu.')}</p>
- <div class="ideas">${IDEAS.map(([f,en,sw])=>`<figure class="card idea"><div class="pic"><img src="/img/ideas/${f}.jpg" loading="lazy" decoding="async" alt="${L(en,sw)} (sample photo)"></div><figcaption class="bd"><b>${L(en,sw)}</b><a class="link" href="${wa(L(`Hello Vincent, can you make something like this: ${en}? (Design ideas on the Leo Furniture site)`,`Habari Vincent, unaweza kutengeneza kitu kama hiki: ${sw}? (Mawazo ya muundo kwenye tovuti ya Leo Furniture)`))}" target="_blank" rel="noopener">${L('Ask Vincent about this →','Muulize Vincent →')}</a></figcaption></figure>`).join('')}</div>
+ <div class="ideas">${IDEAS.map(([f,en,sw])=>`<figure class="card idea"><div class="pic"><img src="/img/ideas/${f}.jpg" loading="lazy" decoding="async" alt="${L(en,sw)} (sample photo)"></div><figcaption class="bd"><b>${L(en,sw)}</b><a class="link" href="${wa(W(`Habari Vincent, unaweza kunitengenezea kitu kama hiki: ${sw}? (Nimekiona kwenye Mawazo ya muundo, tovuti ya Leo Furniture)`,`Hello Vincent, can you make something like this: ${en}?`))}" target="_blank" rel="noopener">${L('Ask Vincent about this →','Muulize Vincent →')}</a></figcaption></figure>`).join('')}</div>
  <div class="sec"><h2>${L('We deliver to','Tunafikisha hadi')}</h2></div>
  <div class="panel"><p style="margin:0">${L('Serem · Kapsabet · Kisumu · Kakamega · Eldoret · Nakuru · Nairobi, and anywhere in Kenya. Ask Vincent for the delivery cost to your town.','Serem · Kapsabet · Kisumu · Kakamega · Eldoret · Nakuru · Nairobi, na popote nchini Kenya. Muulize Vincent gharama ya usafirishaji hadi mji wako.')}</p></div>
  </div>`,
@@ -198,8 +202,8 @@ shop:()=>{const q=S.q.toLowerCase();const ps=S.products.filter(p=>(S.cat==='all'
  <div class="btns" style="justify-content:center;margin:18px 0 6px">${ps.length>S.limit?`<button class="btn b-acc" data-moreone>${L(`See more (${Math.min(PAGE,ps.length-S.limit)} more)`,`Ona zaidi (${Math.min(PAGE,ps.length-S.limit)} zaidi)`)}</button><button class="btn b-ghost" data-moreall>${L('See all','Ona zote')}</button>`:''}${Math.min(S.limit,ps.length)>6?`<button class="btn b-ghost" data-totop>${L('↑ Back to top','↑ Rudi juu')}</button>`:''}</div>`:`<div class="panel"><b>${L('Photos coming soon.','Picha zinakuja hivi karibuni.')}</b><p class="muted" style="margin:4px 0 10px">${L(`Vincent makes ${what} to order. Ask him on WhatsApp for photos of his work.`,`Vincent hutengeneza ${what} kwa oda. Muulize kwenye WhatsApp akutumie picha za kazi yake.`)}</p><a class="btn b-wa" href="${wa(L('Hello Vincent, I am looking for: ','Habari Vincent, natafuta: ')+(S.q||what))}" target="_blank" rel="noopener">${L('Ask on WhatsApp','Uliza kwenye WhatsApp')}</a></div>`}</div>`},
 
 item:()=>{const p=S.products.find(x=>x.id===S.item);if(!p)return V.shop();
- const pr=SHOW_PRICES&&p.kes?` (${money(p.kes)})`:'';
- const msg=L(`Hello Vincent, I am interested in the ${p.name}${pr} from the Leo Furniture app. Please share details and delivery cost to my town: `,`Habari Vincent, ninavutiwa na ${p.name}${pr} kutoka programu ya Leo Furniture. Tafadhali nitumie maelezo na gharama ya kusafirisha hadi mji wangu: `);
+ const pr=SHOW_PRICES&&p.kes?` (${KES(p.kes)})`:'';
+ const msg=W(`Habari Vincent, ninavutiwa na ${p.name_sw||p.name}${pr} kutoka tovuti ya Leo Furniture. Tafadhali nitumie maelezo na gharama ya kusafirisha hadi mji wangu.`,`Hello Vincent, I am interested in the ${p.name}${pr}. Please send details and the delivery cost to my town.`,S.lang==='sw'?'\nMji wangu: ':'\nMji wangu / My town: ');
  return `<div class="wrap"><button class="link" data-go="shop" style="padding-left:0">${L('← Back to shop','← Rudi dukani')}</button>
  <div class="detail"><div class="pic">${pic(p)}</div><div style="display:grid;gap:12px;align-content:start">
  <span class="muted">${catName(p.cat)}</span><h1 style="font-size:32px">${esc(PN(p))}</h1>
@@ -213,8 +217,9 @@ item:()=>{const p=S.products.find(x=>x.id===S.item);if(!p)return V.shop();
 
 list:()=>{const rows=S.list.map(x=>({...x,p:S.products.find(p=>p.id===x.id)})).filter(x=>x.p);
  const tot=rows.reduce((a,x)=>a+(x.p.kes||0)*x.q,0), quote=rows.some(x=>!x.p.kes);
- const items=rows.map(x=>`• ${x.q} × ${PN(x.p)}${SHOW_PRICES&&x.p.kes?` (${money(x.p.kes)})`:''}`).join('\n');
- const msg=L('Hello Vincent, I would like to order from Leo Furniture:\n','Habari Vincent, ningependa kuagiza kutoka Leo Furniture:\n')+items+(SHOW_PRICES?`\n${L('Estimated total','Jumla inayokadiriwa')}: ${money(tot)}${quote?L(' + quoted items',' + bidhaa za kuulizia bei'):''}`:L('\nPlease send me the prices.','\nTafadhali nitumie bei.'))+L('\nMy name and town: ','\nJina na mji wangu: ');
+ const items=rows.map(x=>`• ${x.q} × ${x.p.name_sw||x.p.name}${SHOW_PRICES&&x.p.kes?` (${KES(x.p.kes)})`:''}`).join('\n');
+ const en=S.lang!=='sw', b=(sw,e)=>en?`${sw} / ${e}`:sw;
+ const msg=W('Habari Vincent, ningependa kuagiza kutoka Leo Furniture:','Hello Vincent, I would like to order from Leo Furniture:')+'\n'+items+(SHOW_PRICES&&tot?`\n${b('Jumla inayokadiriwa','Estimated total')}: ${KES(tot)}${quote?b(' + bidhaa za kuulizia bei',' + items to quote'):''}`:'\n'+b('Tafadhali nitumie bei.','Please send me the prices.'))+'\n'+b('Jina na mji wangu','My name and town')+': ';
  return `<div class="wrap"><h1 style="font-size:32px">${L('My list','Orodha yangu')}</h1>
  ${rows.length?`<div class="panel">${rows.map(x=>`<div class="row"><div><b>${esc(PN(x.p))}</b><div class="muted">${money(x.p.kes)}</div></div><div class="qty"><button data-q="${x.id}" data-d="-1" aria-label="${L('Less','Punguza')}">−</button><b>${x.q}</b><button data-q="${x.id}" data-d="1" aria-label="${L('More','Ongeza')}">+</button></div></div>`).join('')}
  ${SHOW_PRICES?`<div class="row"><b>${L('Estimated total','Jumla inayokadiriwa')}</b><span class="price">${money(tot)}${quote?' + …':''}</span></div>`:''}</div>
@@ -225,12 +230,12 @@ list:()=>{const rows=S.list.map(x=>({...x,p:S.products.find(p=>p.id===x.id)})).f
 contact:()=>`<div class="wrap"><h1 style="font-size:32px">${L('Talk to Vincent','Ongea na Vincent')}</h1>
  <div class="panel" style="display:grid;gap:10px"><p style="margin:0">${L('For orders, custom designs, interior design and delivery quotes, call or WhatsApp:','Kwa oda, miundo maalum, mapambo ya ndani na bei za usafirishaji, piga simu au tuma WhatsApp:')}</p>
  <p class="price" style="font-size:22px;margin:0">+254 729 754 199</p>
- <div class="btns"><a class="btn b-wa" href="${wa(L('Hello Vincent, ','Habari Vincent, '))}" target="_blank" rel="noopener">WhatsApp</a><a class="btn b-wal" href="tel:+254729754199">${L('Call','Piga simu')}</a></div>
+ <div class="btns"><a class="btn b-wa" href="${wa('Habari Vincent, ')}" target="_blank" rel="noopener">WhatsApp</a><a class="btn b-wal" href="tel:+254729754199">${L('Call','Piga simu')}</a></div>
  <p class="note" style="margin:0">${L(`M-Pesa payments: Send Money to ${MPESA}. Workshop: Serem Town, Nandi County.`,`Malipo ya M-Pesa: Tuma Pesa kwa ${MPESA}. Karakana: Mji wa Serem, Kaunti ya Nandi.`)}</p></div>
  <div class="sec"><h2>${L('Request a custom piece or interior design','Omba samani maalum au mapambo ya ndani')}</h2></div>
  <form class="panel" id="req"><label>${L('Your name','Jina lako')}<input name="n" required autocomplete="name"></label>
  <label>${L('Your town','Mji wako')}<input name="t" required placeholder="${L('e.g. Kisumu','k.m. Kisumu')}"></label>
- <label>${L('What do you need?','Unahitaji nini?')}<select name="c">${CATS.map(([c])=>`<option>${catName(c)}</option>`).join('')}</select></label>
+ <label>${L('What do you need?','Unahitaji nini?')}<select name="c">${CATS.map(([c])=>`<option value="${c}">${catName(c)}</option>`).join('')}</select></label>
  <label>${L('Describe it (size, colour, budget)','Elezea (ukubwa, rangi, bajeti)')}<textarea name="d" rows="4"></textarea></label>
  <button class="btn b-wa">${L('Send request on WhatsApp','Tuma ombi kwenye WhatsApp')}</button><p class="note" style="margin:0">${L('This opens WhatsApp with your message ready. Tap send there.','Hii itafungua WhatsApp ujumbe wako ukiwa tayari. Bonyeza tuma huko.')}</p></form>
  ${fbkHTMLform()}
@@ -263,7 +268,7 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('submit',async e=>{
  const f=e.target;if(f.id!=='req')return;e.preventDefault();
- if(f.id==='req'){const m=L(`Hello Vincent, my name is ${f.n.value} from ${f.t.value}. I need: ${f.c.value}.\n${f.d.value}`,`Habari Vincent, jina langu ni ${f.n.value} kutoka ${f.t.value}. Nahitaji: ${f.c.value}.\n${f.d.value}`);
+ if(f.id==='req'){const m=W(`Habari Vincent, jina langu ni ${f.n.value} kutoka ${f.t.value}. Nahitaji: ${catSw(f.c.value)}.`,`Hello Vincent, my name is ${f.n.value} from ${f.t.value}. I need: ${catEn(f.c.value)}.`,f.d.value?`\n${f.d.value}`:'');
   const a=document.createElement('a');a.href=wa(m);a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove()}
 });
 $('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
