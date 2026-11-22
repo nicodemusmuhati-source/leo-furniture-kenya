@@ -40,17 +40,19 @@ a{color:inherit}
 button,input,select,textarea{font:inherit;font-size:16px}
 button{cursor:pointer}
 :focus-visible{outline:3px solid var(--acc);outline-offset:2px}
-.top{position:sticky;top:0;z-index:5;background:var(--wal);color:#fff;display:flex;align-items:center;gap:10px;padding:10px max(4vw,14px)}
+.top{position:sticky;top:0;z-index:5;background:var(--wal);color:#fff;display:flex;align-items:center;gap:10px;padding:10px var(--side)}
+:root{--side:calc(max(4vw,14px) + max(0px,(100% - 1100px)/2))}
 .top .brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex:1}
 .top b{font-weight:800;font-size:19px;letter-spacing:-.3px}
 .top small{display:block;font-size:12px;opacity:.8}
 .cur{background:transparent;border:1.5px solid #ffffff66;color:#fff;border-radius:99px;padding:8px 14px;min-height:40px}
 .top .brand svg{flex:none}.top .cur{flex:none;padding:6px 10px;font-size:14px;min-height:40px}@media(max-width:400px){.top small{display:none}}
 .wrap{max-width:1100px;margin:0 auto;padding:18px max(4vw,14px)}
-.hero{background:var(--wal);color:#fff;padding:22px max(4vw,14px) 26px;display:grid;gap:16px}
+.hero{background:var(--wal);color:#fff;padding:14px var(--side) 26px;display:grid;gap:18px}
 .hero p{margin:0;opacity:.9;max-width:36em}
-.hero .art{border-radius:18px;overflow:hidden;background:var(--wal2);aspect-ratio:16/10}
-.hero .art svg{width:100%;height:100%;display:block}
+.hero .board{display:block;width:100%;height:auto;border-radius:16px;box-shadow:0 10px 30px #0006}
+.hero h1{font-size:clamp(26px,4.2vw,42px)}
+.htxt{display:grid;gap:12px;align-content:center}
 .btns{display:flex;flex-wrap:wrap;gap:10px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 18px;border-radius:12px;border:0;font-weight:600;text-decoration:none}
 .b-acc{background:var(--acc);color:#231710}.b-wa{background:var(--ok);color:#fff}
@@ -74,7 +76,8 @@ button{cursor:pointer}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
 .steps{margin:0;padding-left:1.3em;display:grid;gap:6px}
 .detail{display:grid;gap:18px}
-@media(min-width:760px){.detail{grid-template-columns:1.1fr 1fr}.hero{grid-template-columns:1fr 1fr;align-items:center;padding:36px 5vw}}
+@media(min-width:760px){.detail{grid-template-columns:1.1fr 1fr}.hero{padding:24px var(--side) 34px;justify-items:center}.hero .board{max-width:760px}.htxt{max-width:760px;width:100%}}
+@media(min-width:1024px){.cats{grid-template-columns:repeat(7,minmax(0,1fr))}.hero{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:center;justify-items:stretch;gap:40px;padding:32px var(--side) 40px}.hero .board{max-width:none}}
 .detail .pic{border-radius:18px;overflow:hidden;aspect-ratio:4/3;background:var(--wal2)}
 .detail .pic svg,.detail .pic img{width:100%;height:100%;object-fit:cover;display:block}
 .tabs{position:fixed;bottom:0;left:0;right:0;z-index:6;background:var(--bg);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:calc(56px + env(safe-area-inset-bottom))}
@@ -167,13 +170,11 @@ function tabs(){
 }
 
 const V={
-home:()=>`<section class="hero"><div><h1>${L('Furniture made by hand in Serem, delivered across Kenya','Samani zilizotengenezwa kwa mkono Serem, tunafikisha kote Kenya')}</h1>
+home:()=>`<section class="hero"><img class="board" src="/img/leo-furniture-whatsapp-preview-v2.jpg" width="1200" height="630" alt="Leo Furniture logo and name on an oak board, with the slogan Real Craft. Real Quality. Real Kenyan. in carved wooden letters, separated by nails, above a timber rail and a claw hammer" fetchpriority="high"><div class="htxt"><h1>${L('Furniture made by hand in Serem, delivered across Kenya','Samani zilizotengenezwa kwa mkono Serem, tunafikisha kote Kenya')}</h1>
  <p>${L('Wall units, kitchen cabinets, classic tables, executive couches and full interior design by Vincent and the Leo Furniture workshop.','Kabati za ukutani, kabati za jikoni, meza za kifahari, makochi ya kifahari na mapambo kamili ya ndani, kutoka kwa Vincent na karakana ya Leo Furniture.')}</p>
- <div class="btns" style="margin-top:16px"><button class="btn b-acc" data-go="shop">${L('Browse furniture','Angalia samani')}</button><a class="btn b-wa" href="${wa(L('Hello Vincent, I found Leo Furniture on the app and would like to ask about furniture.','Habari Vincent, nimeona Leo Furniture kwenye programu na ningependa kuuliza kuhusu samani.'))}" target="_blank" rel="noopener">${L('WhatsApp Vincent','WhatsApp Vincent')}</a></div></div>
- <div class="art">${svg('couch','#5a3a24')}</div></section>
- <div class="wrap"><img src="/img/leo-furniture-slogan-banner.jpg" width="1665" height="345" alt="Real Craft. Real Quality. Real Kenyan. – Leo Furniture slogan in carved wooden letters, with a nail and a claw hammer" style="display:block;width:100%;height:auto;border-radius:14px;margin:4px 0 6px">
- <div class="sec"><h2>${L('What we make','Tunachotengeneza')}</h2></div>
- <div class="cards2">${CATS.map(([c])=>`<button class="cat" data-cat="${c}"><svg viewBox="40 30 240 150">${ART[c]}</svg><b>${catName(c)}</b></button>`).join('')}</div>
+ <div class="btns" style="margin-top:4px"><button class="btn b-acc" data-go="shop">${L('Browse furniture','Angalia samani')}</button><a class="btn b-wa" href="${wa(L('Hello Vincent, I found Leo Furniture on the app and would like to ask about furniture.','Habari Vincent, nimeona Leo Furniture kwenye programu na ningependa kuuliza kuhusu samani.'))}" target="_blank" rel="noopener">${L('WhatsApp Vincent','WhatsApp Vincent')}</a></div></div></section>
+ <div class="wrap"><div class="sec"><h2>${L('What we make','Tunachotengeneza')}</h2></div>
+ <div class="cards2 cats">${CATS.map(([c])=>`<button class="cat" data-cat="${c}"><svg viewBox="40 30 240 150">${ART[c]}</svg><b>${catName(c)}</b></button>`).join('')}</div>
  <div class="sec"><h2>${L('Popular pieces','Bidhaa maarufu')}</h2><button class="link" data-go="shop">${L('See all','Ona zote')}</button></div>
  <div class="grid">${S.products.slice(0,4).map(card).join('')}</div>
  <div class="sec"><h2>${L('We deliver to','Tunafikisha hadi')}</h2></div>
