@@ -34,6 +34,7 @@ button{cursor:pointer}
 .top b{font-weight:800;font-size:19px;letter-spacing:-.3px}
 .top small{display:block;font-size:12px;opacity:.8}
 .cur{background:transparent;border:1.5px solid #ffffff66;color:#fff;border-radius:99px;padding:8px 14px;min-height:40px}
+.top .brand svg{flex:none}.top .cur{flex:none;padding:6px 10px;font-size:14px;min-height:40px}@media(max-width:400px){.top small{display:none}}
 .wrap{max-width:1100px;margin:0 auto;padding:18px max(4vw,14px)}
 .hero{background:var(--wal);color:#fff;padding:22px max(4vw,14px) 26px;display:grid;gap:16px}
 .hero p{margin:0;opacity:.9;max-width:36em}
@@ -109,7 +110,7 @@ if(CFG.apiKey){try{const [a,b,c]=await Promise.all([import('https://www.gstatic.
 ({initializeApp,deleteApp}=a);({getAuth,GoogleAuthProvider,signInWithPopup,signInWithEmailAndPassword,signOut,onAuthStateChanged,createUserWithEmailAndPassword,updatePassword}=b);({getFirestore,collection,doc,onSnapshot,setDoc,deleteDoc,getDoc,getDocs,addDoc,serverTimestamp,query,orderBy,limit}=c)}catch(e){}}
 // Firebase web settings (public by design; security comes from firestore.rules)
 {
-const PHONE='254729754199', MPESA='0729754199', SHOW_PRICES=false;
+const PHONE='254729754199', MPESA='0729754199', SHOW_PRICES=true;
 const CATS=[
  ['wall','Wall units','Kabati za ukutani'],['kitchen','Kitchen cabinets','Kabati za jikoni'],['table','Classic tables','Meza za kifahari'],
  ['coffee','Coffee tables','Meza za sebuleni'],['couch','Executive couches','Makochi ya kifahari'],['interior','Interior design','Mapambo ya ndani'],['custom','Custom carpentry','Useremala maalum']];
@@ -136,12 +137,13 @@ let S={view:'home',cat:'all',item:null,q:'',
 const $=s=>document.querySelector(s), app=$('#app');
 const L=(en,sw)=>S.lang==='sw'?sw:en;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const money=k=>!SHOW_PRICES||!k?L('Ask for price','Uliza bei'):S.cur==='KES'?'KES '+Math.round(k).toLocaleString('en-KE'):'US$ '+Math.round(k/S.rate).toLocaleString('en-US');
+const money=k=>!SHOW_PRICES||!k?L('Ask for price','Uliza bei'):S.cur==='KES'?'KES '+Math.round(k).toLocaleString('en-KE'):'≈ US$ '+Math.round(k/S.rate).toLocaleString('en-US');
+const PN=p=>L(p.name,p.name_sw||p.name), PD=p=>L(p.desc,p.desc_sw||p.desc);
 const catName=c=>{const x=CATS.find(x=>x[0]===c)||[,'Other','Nyingine'];return L(x[1],x[2])};
-const pic=p=>p.img?`<img src="${p.img}" alt="${esc(p.name)}">`:svg(p.cat);
+const pic=p=>p.img?`<img src="${p.img}" alt="${esc(PN(p))}">`:svg(p.cat);
 const wa=t=>`https://wa.me/${PHONE}?text=${encodeURIComponent(t)}`;
 const toast=t=>{const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2200)};
-const card=p=>`<button class="card" data-item="${p.id}"><div class="pic">${pic(p)}</div><div class="bd"><span class="muted">${catName(p.cat)}</span><h3>${esc(p.name)}</h3><span class="price">${money(p.kes)}</span></div></button>`;
+const card=p=>`<button class="card" data-item="${p.id}"><div class="pic">${pic(p)}</div><div class="bd"><span class="muted">${catName(p.cat)}</span><h3>${esc(PN(p))}</h3><span class="price">${money(p.kes)}</span></div></button>`;
 const listCount=()=>S.list.reduce((a,x)=>a+x.q,0);
 
 function tabs(){
@@ -178,9 +180,9 @@ item:()=>{const p=S.products.find(x=>x.id===S.item);if(!p)return V.shop();
  const msg=L(`Hello Vincent, I am interested in the ${p.name}${pr} from the Leo Furniture app. Please share details and delivery cost to my town: `,`Habari Vincent, ninavutiwa na ${p.name}${pr} kutoka programu ya Leo Furniture. Tafadhali nitumie maelezo na gharama ya kusafirisha hadi mji wangu: `);
  return `<div class="wrap"><button class="link" data-go="shop" style="padding-left:0">${L('← Back to shop','← Rudi dukani')}</button>
  <div class="detail"><div class="pic">${pic(p)}</div><div style="display:grid;gap:12px;align-content:start">
- <span class="muted">${catName(p.cat)}</span><h1 style="font-size:32px">${esc(p.name)}</h1>
+ <span class="muted">${catName(p.cat)}</span><h1 style="font-size:32px">${esc(PN(p))}</h1>
  <span class="price" style="font-size:24px">${money(p.kes)}</span>
- <p style="margin:0">${esc(p.desc)}</p><p class="muted" style="margin:0">${L('Size','Ukubwa')}: ${esc(p.size)} · ${L('Colours, wood and fabric can be changed to your taste.','Rangi, aina ya mbao na kitambaa vinaweza kubadilishwa upendavyo.')}</p>
+ <p style="margin:0">${esc(PD(p))}</p><p class="muted" style="margin:0">${L('Size','Ukubwa')}: ${esc(p.size)} · ${L('Colours, wood and fabric can be changed to your taste.','Rangi, aina ya mbao na kitambaa vinaweza kubadilishwa upendavyo.')}</p>
  <div class="btns"><a class="btn b-wa" href="${wa(msg)}" target="_blank" rel="noopener">${L('Order on WhatsApp','Agiza kwenye WhatsApp')}</a><button class="btn b-acc" data-add="${p.id}">${L('Add to my list','Ongeza kwenye orodha')}</button></div>
  <div class="panel"><h3>${L('How to pay with M-Pesa','Jinsi ya kulipa kwa M-Pesa')}</h3><ol class="steps">${L(
   `<li>Agree the final price and delivery cost with Vincent on WhatsApp first.</li><li>Open M-PESA → <b>Send Money</b>.</li><li>Enter <b style="white-space:nowrap">${MPESA}</b> (Vincent, Leo Furniture).</li><li>Enter the agreed amount and your PIN.</li><li>Send the M-Pesa confirmation message to Vincent on WhatsApp.</li>`,
@@ -189,10 +191,10 @@ item:()=>{const p=S.products.find(x=>x.id===S.item);if(!p)return V.shop();
 
 list:()=>{const rows=S.list.map(x=>({...x,p:S.products.find(p=>p.id===x.id)})).filter(x=>x.p);
  const tot=rows.reduce((a,x)=>a+(x.p.kes||0)*x.q,0), quote=rows.some(x=>!x.p.kes);
- const items=rows.map(x=>`• ${x.q} × ${x.p.name}`).join('\n');
+ const items=rows.map(x=>`• ${x.q} × ${PN(x.p)}${SHOW_PRICES&&x.p.kes?` (${money(x.p.kes)})`:''}`).join('\n');
  const msg=L('Hello Vincent, I would like to order from Leo Furniture:\n','Habari Vincent, ningependa kuagiza kutoka Leo Furniture:\n')+items+(SHOW_PRICES?`\n${L('Estimated total','Jumla inayokadiriwa')}: ${money(tot)}${quote?L(' + quoted items',' + bidhaa za kuulizia bei'):''}`:L('\nPlease send me the prices.','\nTafadhali nitumie bei.'))+L('\nMy name and town: ','\nJina na mji wangu: ');
  return `<div class="wrap"><h1 style="font-size:32px">${L('My list','Orodha yangu')}</h1>
- ${rows.length?`<div class="panel">${rows.map(x=>`<div class="row"><div><b>${esc(x.p.name)}</b><div class="muted">${money(x.p.kes)}</div></div><div class="qty"><button data-q="${x.id}" data-d="-1" aria-label="${L('Less','Punguza')}">−</button><b>${x.q}</b><button data-q="${x.id}" data-d="1" aria-label="${L('More','Ongeza')}">+</button></div></div>`).join('')}
+ ${rows.length?`<div class="panel">${rows.map(x=>`<div class="row"><div><b>${esc(PN(x.p))}</b><div class="muted">${money(x.p.kes)}</div></div><div class="qty"><button data-q="${x.id}" data-d="-1" aria-label="${L('Less','Punguza')}">−</button><b>${x.q}</b><button data-q="${x.id}" data-d="1" aria-label="${L('More','Ongeza')}">+</button></div></div>`).join('')}
  ${SHOW_PRICES?`<div class="row"><b>${L('Estimated total','Jumla inayokadiriwa')}</b><span class="price">${money(tot)}${quote?' + …':''}</span></div>`:''}</div>
  <p class="muted">${L('Delivery cost depends on your town and is confirmed by Vincent.','Gharama ya usafirishaji inategemea mji wako na huthibitishwa na Vincent.')}</p>
  <div class="btns"><a class="btn b-wa" href="${wa(msg)}" target="_blank" rel="noopener">${L('Send order on WhatsApp','Tuma oda kwenye WhatsApp')}</a><button class="btn b-ghost" data-clear>${L('Clear list','Futa orodha')}</button></div>`
@@ -325,13 +327,17 @@ V.manage=()=>{
   <label>Category<select name="cat">${CATS.map(([c,n])=>`<option value="${c}">${n}</option>`).join('')}</select></label>
   <label>Size<input name="size" maxlength="80" placeholder="e.g. 2.4 m × 1.8 m"></label>
   <label>Description<textarea name="desc" rows="3" maxlength="600"></textarea></label>
-  <label>Price in KES (hidden from customers for now; 0 = ask for price)<input name="kes" type="number" min="0" step="500" inputmode="numeric" value="0"></label>
+  <label>Name in Kiswahili<input name="name_sw" maxlength="80"></label>
+  <label>Description in Kiswahili<textarea name="desc_sw" rows="3" maxlength="600"></textarea></label>
+  <button type="button" class="link" data-aitr style="justify-self:start;padding-left:0">Translate English to Kiswahili</button>
+  <label>Price in KES (0 = customers see "Ask for price")<input name="kes" type="number" min="0" step="500" inputmode="numeric" value="0"></label>
   <label>Photo<input name="img" type="file" accept="image/*"></label>
   <p class="note" id="aihint" style="margin:0">Choose a photo first: the name, category and description will be suggested for you. Then add the price.</p>
   <button type="button" class="link" data-aiagain hidden style="justify-self:start;padding-left:0">Suggest again from this photo</button>
   <div class="btns"><button class="btn b-acc">Save product</button><button type="button" class="btn b-ghost" data-pnew>Clear form</button></div></form>
  <div class="sec"><h2>Products</h2><button class="btn b-ghost" id="seed" data-seed ${isGoogleAdmin()&&S.live&&S.remote===0?'':'hidden'}>Load starter products</button></div>
  <div class="panel" id="plist">${prodRows()}</div>
+ <p style="margin:10px 0 0"><button type="button" class="btn b-ghost" data-trall>Add Kiswahili to products that don't have it</button></p>
  ${S.role!=='admin'?`<form class="panel" id="cp" style="margin-top:16px"><h3>Change the owner PIN</h3><label>New PIN (at least 6 digits)<input name="p" type="password" inputmode="numeric" pattern="[0-9]{6,12}" required autocomplete="new-password"></label><label>Repeat new PIN<input name="p2" type="password" inputmode="numeric" pattern="[0-9]{6,12}" required autocomplete="new-password"></label><button class="btn b-wal">Change PIN</button></form>`:''}
  ${isGoogleAdmin()?`<div id="sec">${secHTML()}</div>`:''}</div>`;
 };
@@ -343,7 +349,7 @@ document.addEventListener('click',async e=>{
   if('gin' in d){await signInWithPopup(fb.auth,new GoogleAuthProvider())}
   else if('sout' in d){await signOut(fb.auth);S.editing=null;render()}
   else if('pnew' in d){S.editing=null;$('#pf').reset();$('#pf').pid.value='';$('#ft').textContent='Add a product'}
-  else if(d.pedit){const p=S.products.find(x=>x.id===d.pedit),f=$('#pf');S.editing=p.id;f.pid.value=p.id;f.name.value=p.name;f.cat.value=p.cat;f.size.value=p.size||'';f.desc.value=p.desc||'';f.kes.value=p.kes||0;$('#ft').textContent='Edit: '+p.name;f.scrollIntoView({behavior:'smooth'})}
+  else if(d.pedit){const p=S.products.find(x=>x.id===d.pedit),f=$('#pf');S.editing=p.id;f.pid.value=p.id;f.name.value=p.name;f.cat.value=p.cat;f.size.value=p.size||'';f.desc.value=p.desc||'';f.name_sw.value=p.name_sw||'';f.desc_sw.value=p.desc_sw||'';f.kes.value=p.kes||0;$('#ft').textContent='Edit: '+p.name;f.scrollIntoView({behavior:'smooth'})}
   else if(d.pdel){const p=S.products.find(x=>x.id===d.pdel);modal(`<h2>Delete ${esc(p.name)}?</h2><p class="muted">Customers will no longer see it.</p><div class="btns"><button class="btn b-wal" data-preally="${p.id}">Delete</button><button class="btn b-ghost" data-close>Keep</button></div>`)}
   else if(d.preally){const p=S.products.find(x=>x.id===d.preally);closeModal();await deleteDoc(doc(fb.db,'products',d.preally));logAct('deleted',p&&p.name);toast('Product deleted')}
   else if('seed' in d){busy(true);let i=1;for(const p of DEF){const {id,...rest}=p;await setDoc(doc(fb.db,'products',id),{...rest,order:i++,updatedAt:serverTimestamp(),updatedBy:S.user.uid})}logAct('loaded starter products');busy(false);toast('Starter products loaded')}
@@ -358,7 +364,8 @@ document.addEventListener('submit',async e=>{
   else if(f.id==='pf'){
    const id=f.pid.value||('p'+Date.now().toString(36)),old=S.products.find(p=>p.id===id&&f.pid.value);
    let img=old&&old.img||'';if(f.img.files[0])img=await shrink(f.img.files[0]);
-   const data={name:f.name.value.trim(),cat:f.cat.value,desc:f.desc.value.trim(),size:f.size.value.trim(),kes:+f.kes.value||0,img,order:old&&typeof old.order==='number'?old.order:-Date.now(),updatedAt:serverTimestamp(),updatedBy:S.user.uid};
+   if((!f.name_sw.value.trim()||!f.desc_sw.value.trim())&&f.name.value.trim()){try{const t=await translateSw(f.name.value,f.desc.value);if(!f.name_sw.value.trim())f.name_sw.value=t.name_sw||'';if(!f.desc_sw.value.trim())f.desc_sw.value=t.description_sw||''}catch(x){}}
+   const data={name:f.name.value.trim(),name_sw:f.name_sw.value.trim().slice(0,80),desc_sw:f.desc_sw.value.trim().slice(0,600),cat:f.cat.value,desc:f.desc.value.trim(),size:f.size.value.trim(),kes:+f.kes.value||0,img,order:old&&typeof old.order==='number'?old.order:-Date.now(),updatedAt:serverTimestamp(),updatedBy:S.user.uid};
    await setDoc(doc(fb.db,'products',id),data);logAct(old?'edited':'added',data.name);
    S.editing=null;f.reset();f.pid.value='';$('#ft').textContent='Add a product';toast(old?'Product updated':'Product added')}
   else if(f.id==='nf'){
@@ -383,7 +390,9 @@ Look at the photo and identify the main furniture piece. Reply with JSON only:
    (wall = TV wall units and display cabinets; kitchen = kitchen cabinets; table = dining tables, office desks and other big tables;
     coffee = coffee tables and side tables; couch = sofas, couches and armchairs; interior = a finished room or interior design work;
     custom = beds, wardrobes, doors, shelves, school or church furniture and anything else),
- "description": 2 sentences, at most 350 characters, in plain friendly English, describing what a buyer can see: type, style, colour or finish, and features such as glass doors, drawers, carvings, cup holders or turned legs. If it is painted or upholstered, end with "Available in your choice of colour."}
+ "description": 2 sentences, at most 350 characters, in plain friendly English, describing what a buyer can see: type, style, colour or finish, and features such as glass doors, drawers, carvings, cup holders or turned legs. If it is painted or upholstered, end with "Available in your choice of colour.",
+ "name_sw": the same name in natural Kenyan Swahili as a Kenyan furniture shop would write it (keep loan words Kenyans use, like "wall unit", "sofa" or "TV", where clearer),
+ "description_sw": the same description in natural, simple Kenyan Swahili; if painted or upholstered end with "Inapatikana kwa rangi unayopenda."}
 Never mention price, never guess the wood species or exact dimensions. If there is no furniture in the photo, reply {"name":"","category":"custom","description":""}.`;
 async function aiModel(){
  if(aiModels)return aiModels;
@@ -403,7 +412,7 @@ async function suggestFromPhoto(file){
   if(!out)throw err;
   if(!out.name){hint.textContent='No furniture recognised in this photo. Please type the details.';return}
   const fill=(el,v)=>{if(v&&(!el.value.trim()||el.dataset.ai==='1')){el.value=String(v).slice(0,el.maxLength>0?el.maxLength:600);el.dataset.ai='1'}};
-  fill(f.name,out.name);fill(f.desc,out.description);
+  fill(f.name,out.name);fill(f.desc,out.description);fill(f.name_sw,out.name_sw);fill(f.desc_sw,out.description_sw);
   if(CATS.some(c=>c[0]===out.category)&&(f.cat.dataset.ai==='1'||!f.pid.value)){f.cat.value=out.category;f.cat.dataset.ai='1'}
   hint.textContent='✨ Suggested from the photo. Check the name and description, change anything that is wrong, then add the price.';
   if(again)again.hidden=false;
@@ -412,6 +421,24 @@ async function suggestFromPhoto(file){
 document.addEventListener('change',e=>{const el=e.target;if(el.name==='img'&&el.closest('#pf')&&el.files[0]&&fb)suggestFromPhoto(el.files[0])});
 document.addEventListener('input',e=>{const el=e.target;if(el.closest&&el.closest('#pf')&&el.dataset.ai)delete el.dataset.ai});
 document.addEventListener('click',e=>{if(e.target.closest('[data-aiagain]')&&lastPhoto){const f=$('#pf');['name','desc'].forEach(k=>{if(f[k].dataset.ai==='1')f[k].value=''});f.cat.dataset.ai='1';suggestFromPhoto(lastPhoto)}});
+
+async function translateSw(name,desc){
+ const models=await aiModel();let err=null;
+ const prompt=`Translate this furniture product listing from a Kenyan furniture shop into natural, simple Kenyan Swahili, as a Kenyan shop would write it. Keep loan words Kenyans commonly use (like "wall unit", "sofa", "TV") where they are clearer. Reply with JSON only: {"name_sw": "...", "description_sw": "..."}.
+Name: ${name}
+Description: ${desc||''}`;
+ for(const md of models){try{const r=await md.generateContent(prompt);return JSON.parse(r.response.text().replace(/^```(json)?|```$/g,'').trim())}catch(x){err=x}}
+ throw err;
+}
+document.addEventListener('click',async e=>{
+ const t=e.target.closest('[data-aitr],[data-trall]');if(!t||!fb)return;
+ if('aitr' in t.dataset){const f=$('#pf');if(!f.name.value.trim()){toast('Type the English name first');return}
+  t.textContent='Translating…';try{const r=await translateSw(f.name.value,f.desc.value);f.name_sw.value=r.name_sw||'';f.desc_sw.value=r.description_sw||'';toast('Kiswahili added. Check it, then save.')}catch(x){toast('Could not translate right now')}t.textContent='Translate English to Kiswahili'}
+ else{const todo=S.products.filter(p=>!p.name_sw||!p.desc_sw);if(!todo.length){toast('All products already have Kiswahili');return}
+  t.disabled=true;let n=0;for(const p of todo){t.textContent=`Translating ${++n} of ${todo.length}…`;
+   try{const r=await translateSw(p.name,p.desc);await setDoc(doc(fb.db,'products',p.id),{name_sw:String(r.name_sw||'').slice(0,80),desc_sw:String(r.description_sw||'').slice(0,600),updatedAt:serverTimestamp(),updatedBy:S.user.uid},{merge:true})}catch(x){toast(errMsg(x))}}
+  logAct('added Kiswahili to products');t.disabled=false;t.textContent="Add Kiswahili to products that don't have it";toast('Kiswahili added')}
+});
 const route=()=>{if(location.hash==='#manage')go('manage')};
 addEventListener('hashchange',route);route();
 
