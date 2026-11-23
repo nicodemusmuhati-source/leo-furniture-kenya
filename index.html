@@ -214,7 +214,7 @@ shop:()=>{const q=S.q.toLowerCase();const ps=S.products.filter(p=>(S.cat==='all'
 
 item:()=>{const p=S.products.find(x=>x.id===S.item);if(!p)return V.shop();
  const pr=SHOW_PRICES&&p.kes?` (${KES(p.kes)})`:'';
- const msg=W(`Habari Vincent, ninavutiwa na ${p.name_sw||p.name}${pr} kwa mtandao wa Leo Furniture. Tafadhali nitumie details na bei ya delivery hadi town yangu.`,`Hello Vincent, I am interested in the ${p.name}${pr}. Please send details and the delivery cost to my town.`,`\n${S.lang==='sw'?'Link':'Link'}: ${pLink(p)}`+(S.lang==='sw'?'\nTown yangu: ':'\nTown yangu / My town: '));
+ const msg=W(`Hello Vincent, nimependezwa na ${p.name_sw||p.name}${pr} kwa mtandao wa Leo Furniture. Tafadhali nitumie details na bei ya delivery hadi town yangu.`,`Hello Vincent, I am interested in the ${p.name}${pr}. Please send details and the delivery cost to my town.`,`\n${S.lang==='sw'?'Link':'Link'}: ${pLink(p)}`+(S.lang==='sw'?'\nTown yangu: ':'\nTown yangu / My town: '));
  return `<div class="wrap"><div class="toprow"><button class="link" data-go="shop" style="padding-left:0">${L('← Back to shop','← Rudi kwa Duka')}</button>${flipBtn()}</div>
  <div class="detail"><div class="pic">${pic(p)}</div><div style="display:grid;gap:12px;align-content:start">
  <span class="muted">${catName(p.cat)}</span><h1 style="font-size:32px">${esc(PN(p))}</h1>
