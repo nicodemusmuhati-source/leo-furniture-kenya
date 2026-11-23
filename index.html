@@ -114,6 +114,7 @@ button.idea{font:inherit;text-align:left;padding:0;cursor:pointer;color:inherit}
 .jumpmenu{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 10px 30px #3a241433;padding:8px;display:grid;min-width:220px;animation:jm .15s ease-out}
 .jumpmenu[hidden]{display:none}
 @keyframes jm{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.jumpmenu .ji{width:26px;height:26px;flex:none}
 .jumpmenu .jh{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--soft);padding:4px 10px 6px}
 .jumpmenu button{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 10px;border:0;border-radius:10px;background:none;color:var(--ink);font:inherit;font-size:15px;font-weight:600;text-align:left;cursor:pointer}
 .jumpmenu button:hover,.jumpmenu button:focus-visible{background:var(--card)}
@@ -216,8 +217,8 @@ function tabs(){
  const btn=([v,l])=>`<button data-go="${v}" ${v==='shop'?'data-all':''} class="${S.view===v||(v==='shop'&&S.view==='item')?'on':''}" ${S.view===v?'aria-current="page"':''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true">${ICON[v]}</svg><span>${l}</span>${v==='list'&&n?`<span class="badge">${n}</span>`:''}</button>`;
  $('#tabs').innerHTML=items.map(btn).join('');
  $('#topnav').innerHTML=items.map(btn).join('');
- const J=[['s-make',L('What we make','Tunachotengeneza'),'🪚'],['s-popular',L('Popular pieces','Fanicha maarufu'),'⭐'],['s-ideas',L('Design ideas','Design ideas'),'💡'],['s-deliver',L('We deliver to','Tunadeliver hadi'),'🚚'],['top',L('Back to top','Rudi juu'),'⬆']];
- $('#jumpmenu').innerHTML=`<b class="jh">${L('Go to section','Nenda kwa sehemu')}</b>`+J.map(([id,l,ic])=>`<button role="menuitem" data-jump="${id}"><span aria-hidden="true">${ic}</span>${l}</button>`).join('');
+ const J=[['s-make',L('What we make','Tunachotengeneza'),JI.saw],['s-popular',L('Popular pieces','Fanicha maarufu'),JI.chair],['s-ideas',L('Design ideas','Design ideas'),JI.square],['s-deliver',L('We deliver to','Tunadeliver hadi'),JI.truck],['top',L('Back to top','Rudi juu'),JI.up]];
+ $('#jumpmenu').innerHTML=`<b class="jh">${L('Go to section','Nenda kwa sehemu')}</b>`+J.map(([id,l,ic])=>`<button role="menuitem" data-jump="${id}"><svg class="ji" viewBox="0 0 32 32" aria-hidden="true">${ic}</svg>${l}</button>`).join('');
  $('#jumpbtn').innerHTML=`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>${L('Sections','Sehemu')}<span class="car" aria-hidden="true">▾</span>`;
  $('#jump').hidden=S.view!=='home';if(S.view!=='home')closeJump();
  $('#cur').textContent=S.cur;$('#cur').hidden=!SHOW_PRICES;
@@ -337,6 +338,14 @@ function startRun(){cancelAnimationFrame(runRAF);const r=$('#run');if(!r)return;
   if(!paused&&!document.hidden){acc+=dt*0.035;if(acc>=1){const px=Math.floor(acc);acc-=px;r.scrollLeft+=px}}
   const half=r.scrollWidth/2;if(r.scrollLeft>=half)r.scrollLeft-=half;else if(r.scrollLeft<=0&&paused)r.scrollLeft+=half;
   runRAF=requestAnimationFrame(step)};runRAF=requestAnimationFrame(step)}
+// Woodwork icons for the Sections menu
+const JI={
+ saw:'<path d="M5 21 L22 9 L27 14 L10 26 Z" fill="#cfd6dc" stroke="#6b7680" stroke-width="1.2" stroke-linejoin="round"/><path d="M6.5 22.2l1.2-.2-.3 1.3 1.3-.3-.3 1.3 1.3-.3-.3 1.2" fill="none" stroke="#6b7680" stroke-width="1"/><rect x="20" y="4" width="9" height="7" rx="2.5" transform="rotate(35 24.5 7.5)" fill="#a0612f" stroke="#5a3920" stroke-width="1.2"/><circle cx="24.6" cy="7.6" r="1.2" fill="#f2c27a"/>',
+ chair:'<path d="M9 4h14v12H9z" fill="#b5773f" stroke="#5a3920" stroke-width="1.3" stroke-linejoin="round"/><path d="M12 4v12M16 4v12M20 4v12" stroke="#7a4a2a" stroke-width="1"/><path d="M7 16h18v4H7z" fill="#8a5a36" stroke="#5a3920" stroke-width="1.3"/><path d="M9 20v8M23 20v8" stroke="#5a3920" stroke-width="2.2" stroke-linecap="round"/><path d="M25.5 2.5l1 2.1 2.3.3-1.7 1.6.4 2.3-2-1.1-2 1.1.4-2.3-1.7-1.6 2.3-.3z" fill="#f2b630" stroke="#b07a10" stroke-width=".6"/>',
+ square:'<path d="M4 28V6l22 22z" fill="#e7c58f" stroke="#7a4a2a" stroke-width="1.3" stroke-linejoin="round"/><path d="M9 23v-6.5l6.5 6.5z" fill="#fff" stroke="#7a4a2a" stroke-width="1"/><path d="M4 11h2.5M4 15h2.5M4 19h2.5M4 23h2.5" stroke="#7a4a2a" stroke-width="1"/><path d="M27 3l2 2-11 11-3 1 1-3z" fill="#f2c230" stroke="#5a3920" stroke-width="1.1" stroke-linejoin="round"/><path d="M16 14l2 2" stroke="#5a3920" stroke-width="1"/>',
+ truck:'<path d="M2 10h17v12H2z" fill="#a0612f" stroke="#5a3920" stroke-width="1.3" stroke-linejoin="round"/><path d="M4 13h13M4 16h13M4 19h13" stroke="#d9a36b" stroke-width="1.2"/><path d="M19 14h6l4 4.5V22H19z" fill="#3f6f9e" stroke="#25425e" stroke-width="1.3" stroke-linejoin="round"/><path d="M21 15.5h3.5l2.5 3H21z" fill="#cfe3f5"/><circle cx="8" cy="23.5" r="2.6" fill="#333" stroke="#111"/><circle cx="24" cy="23.5" r="2.6" fill="#333" stroke="#111"/><circle cx="8" cy="23.5" r="1" fill="#bbb"/><circle cx="24" cy="23.5" r="1" fill="#bbb"/>',
+ up:'<rect x="6" y="20" width="20" height="6" rx="1.5" fill="#b5773f" stroke="#5a3920" stroke-width="1.2"/><path d="M9 23h14" stroke="#d9a36b"/><path d="M16 17V5M10.5 10.5 16 5l5.5 5.5" fill="none" stroke="#5a3920" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>'
+};
 const closeJump=()=>{const m=$('#jumpmenu');if(m&&!m.hidden){m.hidden=true;$('#jumpbtn').setAttribute('aria-expanded','false');$('#jump').classList.remove('open')}};
 const setHH=()=>document.documentElement.style.setProperty('--hh',($('header.top')?.offsetHeight||70)+'px');
 addEventListener('resize',setHH);
