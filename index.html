@@ -171,7 +171,7 @@ const W=(sw,en,tail='')=>S.lang==='sw'?sw+tail:sw+'\n('+en+')'+tail;
 const KES=k=>'KES '+Number(k).toLocaleString('en-KE');
 const catSw=c=>(CATS.find(x=>x[0]===c)||[c,c,c])[2], catEn=c=>(CATS.find(x=>x[0]===c)||[c,c,c])[1];
 const SITE=()=>location.origin;
-const pLink=p=>p.img&&p.img[0]==='/'?SITE()+p.img:`${SITE()}/#p=${encodeURIComponent(p.id)}`;
+const pLink=p=>`${SITE()}/p/${encodeURIComponent(p.id)}`;
 const wa=t=>`https://wa.me/${PHONE}?text=${encodeURIComponent(t)}`;
 const toast=t=>{const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2200)};
 const card=p=>`<button class="card" data-item="${p.id}"><div class="pic">${pic(p)}</div><div class="bd"><span class="muted">${catName(p.cat)}</span><h3>${esc(PN(p))}</h3><span class="price">${money(p.kes)}</span>${starsLine(p.id)}</div></button>`;
@@ -213,7 +213,7 @@ shop:()=>{const q=S.q.toLowerCase();const ps=S.products.filter(p=>(S.cat==='all'
 
 item:()=>{const p=S.products.find(x=>x.id===S.item);if(!p)return V.shop();
  const pr=SHOW_PRICES&&p.kes?` (${KES(p.kes)})`:'';
- const msg=W(`Habari Vincent, ninavutiwa na ${p.name_sw||p.name}${pr} kwa mtandao wa Leo Furniture. Tafadhali nitumie details na bei ya delivery hadi town yangu.`,`Hello Vincent, I am interested in the ${p.name}${pr}. Please send details and the delivery cost to my town.`,`\n${S.lang==='sw'?'Picha':'Picha / Photo'}: ${pLink(p)}`+(S.lang==='sw'?'\nTown yangu: ':'\nTown yangu / My town: '));
+ const msg=W(`Habari Vincent, ninavutiwa na ${p.name_sw||p.name}${pr} kwa mtandao wa Leo Furniture. Tafadhali nitumie details na bei ya delivery hadi town yangu.`,`Hello Vincent, I am interested in the ${p.name}${pr}. Please send details and the delivery cost to my town.`,`\n${S.lang==='sw'?'Link':'Link'}: ${pLink(p)}`+(S.lang==='sw'?'\nTown yangu: ':'\nTown yangu / My town: '));
  return `<div class="wrap"><button class="link" data-go="shop" style="padding-left:0">${L('← Back to shop','← Rudi dukani')}</button>
  <div class="detail"><div class="pic">${pic(p)}</div><div style="display:grid;gap:12px;align-content:start">
  <span class="muted">${catName(p.cat)}</span><h1 style="font-size:32px">${esc(PN(p))}</h1>
@@ -288,7 +288,7 @@ document.addEventListener('submit',async e=>{
 $('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
 function openIdea(i){const n=IDEAS.length;i=(i+n)%n;S.idea=i;const [f,en,sw,de,ds]=IDEAS[i];const lb=$('#lb');
  lb.innerHTML=`<button class="x" data-lbclose aria-label="${L('Close','Funga')}">×</button><figure><img src="/img/ideas/${f}.jpg" alt="${L(en,sw)} (sample photo)"><figcaption class="cap"><h3>${L(en,sw)}</h3><p>${L(de,ds)}</p><small>${L('Sample photo for ideas. Vincent makes similar pieces to order, in your size and colour.','Picha ya mfano tu. Vincent anatengeneza kama hii kwa oda, kwa size na rangi yako.')}</small>
- <div class="bar"><a class="btn b-wa" href="${wa(W(`Habari Vincent, unaweza kunitengenezea kitu kama hiki: ${sw}? (Nimeiona kwa Design ideas, mtandao wa Leo Furniture)`,`Hello Vincent, can you make something like this: ${en}?`,`\n${S.lang==='sw'?'Picha':'Picha / Photo'}: ${SITE()}/img/ideas/${f}.jpg`))}" target="_blank" rel="noopener">${L('Ask Vincent about this','Muulize Vincent kuhusu hii')}</a></div></figcaption>
+ <div class="bar"><a class="btn b-wa" href="${wa(W(`Habari Vincent, unaweza kunitengenezea kitu kama hiki: ${sw}? (Nimeiona kwa Design ideas, mtandao wa Leo Furniture)`,`Hello Vincent, can you make something like this: ${en}?`,`\nLink: ${SITE()}/i/${f}`))}" target="_blank" rel="noopener">${L('Ask Vincent about this','Muulize Vincent kuhusu hii')}</a></div></figcaption>
  <div class="nav"><button data-lbnav="-1">← ${L('Previous','Iliyopita')}</button><button data-lbnav="1">${L('Next','Inayofuata')} →</button></div></figure>`;
  lb.hidden=false;document.body.style.overflow='hidden';lb.scrollTop=0;$('#lb .x').focus()}
 function closeIdea(){const lb=$('#lb');if(lb.hidden)return;lb.hidden=true;lb.innerHTML='';document.body.style.overflow='';const c=document.querySelector(`[data-idea="${S.idea}"]`);if(c)c.focus({preventScroll:true})}
