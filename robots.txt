@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://leo-furniture-kenya.pages.dev/sitemap.xml
+Sitemap: https://leofurniture.co.ke/sitemap.xml
