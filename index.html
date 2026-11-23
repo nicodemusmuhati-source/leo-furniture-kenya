@@ -62,6 +62,7 @@ button{cursor:pointer}
 .chip{flex:none;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:9px 15px;min-height:44px}
 .chip.on{background:var(--wal);color:#fff;border-color:var(--wal)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:14px}
+.toprow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.lb .toprow h3{margin:0}.flip{border:1.5px solid #7a4a2a;background:#fff;color:#5a3920;border-radius:999px;padding:7px 14px;min-height:38px;font:inherit;font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap}.flip:hover{background:#f6efe6}
 .lb{position:fixed;inset:0;z-index:60;background:#120c08f2;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px;overflow:auto}.lb[hidden]{display:none}
 .lb figure{margin:0;max-width:1000px;width:100%;display:grid;gap:12px}.lb img{width:100%;max-height:68vh;object-fit:contain;border-radius:12px;background:#000}
 .lb .cap{background:#fff;border-radius:12px;padding:14px 16px;color:#2a1d14}.lb .cap h3{margin:0 0 6px;font-size:19px}.lb .cap p{margin:0 0 6px;line-height:1.5}.lb .cap small{color:#7a6a5c}
@@ -214,7 +215,7 @@ shop:()=>{const q=S.q.toLowerCase();const ps=S.products.filter(p=>(S.cat==='all'
 item:()=>{const p=S.products.find(x=>x.id===S.item);if(!p)return V.shop();
  const pr=SHOW_PRICES&&p.kes?` (${KES(p.kes)})`:'';
  const msg=W(`Habari Vincent, ninavutiwa na ${p.name_sw||p.name}${pr} kwa mtandao wa Leo Furniture. Tafadhali nitumie details na bei ya delivery hadi town yangu.`,`Hello Vincent, I am interested in the ${p.name}${pr}. Please send details and the delivery cost to my town.`,`\n${S.lang==='sw'?'Link':'Link'}: ${pLink(p)}`+(S.lang==='sw'?'\nTown yangu: ':'\nTown yangu / My town: '));
- return `<div class="wrap"><button class="link" data-go="shop" style="padding-left:0">${L('← Back to shop','← Rudi dukani')}</button>
+ return `<div class="wrap"><div class="toprow"><button class="link" data-go="shop" style="padding-left:0">${L('← Back to shop','← Rudi kwa Duka')}</button>${flipBtn()}</div>
  <div class="detail"><div class="pic">${pic(p)}</div><div style="display:grid;gap:12px;align-content:start">
  <span class="muted">${catName(p.cat)}</span><h1 style="font-size:32px">${esc(PN(p))}</h1>
  <span class="price" style="font-size:24px">${money(p.kes)}</span>
@@ -222,7 +223,7 @@ item:()=>{const p=S.products.find(x=>x.id===S.item);if(!p)return V.shop();
  <div class="btns"><a class="btn b-wa" data-wa="${p.id}" href="${wa(msg)}" target="_blank" rel="noopener">${L('Order on WhatsApp','Order kwa WhatsApp')}</a><button class="btn b-acc" data-add="${p.id}">${L('Add to my list','Weka kwa list')}</button></div>
  <div class="panel"><h3>${L('How to pay with M-Pesa','Jinsi ya kulipa na M-Pesa')}</h3><ol class="steps">${L(
   `<li>Agree the final price and delivery cost with Vincent on WhatsApp first.</li><li>Open M-PESA → <b>Send Money</b>.</li><li>Enter <b style="white-space:nowrap">${MPESA}</b> (Vincent, Leo Furniture).</li><li>Enter the agreed amount and your PIN.</li><li>Send the M-Pesa confirmation message to Vincent on WhatsApp.</li>`,
-  `<li>Kwanza kubaliana na Vincent kwenye WhatsApp bei ya mwisho na gharama ya usafirishaji.</li><li>Fungua M-PESA → <b>Tuma Pesa</b>.</li><li>Weka namba <b style="white-space:nowrap">${MPESA}</b> (Vincent, Leo Furniture).</li><li>Weka kiasi mlichokubaliana na PIN yako.</li><li>Mtumie Vincent ujumbe wa uthibitisho wa M-Pesa kwenye WhatsApp.</li>`)}</ol></div>
+  `<li>Kwanza ongea na Vincent kwa WhatsApp mkubaliane bei ya mwisho na bei ya delivery.</li><li>Fungua M-PESA → <b>Send Money</b>.</li><li>Weka namba <b style="white-space:nowrap">${MPESA}</b> (Vincent, Leo Furniture).</li><li>Weka kiasi mlichokubaliana na PIN yako.</li><li>Mtumie Vincent ujumbe wa uthibitisho wa M-Pesa kwenye WhatsApp.</li>`)}</ol></div>
  </div></div>${reviewsHTML(p)}</div>`},
 
 list:()=>{const rows=S.list.map(x=>({...x,p:S.products.find(p=>p.id===x.id)})).filter(x=>x.p);
@@ -264,6 +265,7 @@ const closeModal=()=>$('#modal').classList.remove('show');
 
 document.addEventListener('click',e=>{
  const t=e.target.closest('button,a');if(!t)return;const d=t.dataset;
+ if('langflip' in d){S.lang=S.lang==='sw'?'en':'sw';save('leo_lang',S.lang);render();if(!$('#lb').hidden)openIdea(S.idea);return}
  if('idea' in d){openIdea(+d.idea);return}
  if('lbclose' in d){closeIdea();return}
  if('lbnav' in d){openIdea(S.idea+(+d.lbnav));return}
@@ -286,8 +288,9 @@ document.addEventListener('submit',async e=>{
   const a=document.createElement('a');a.href=wa(m);a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove()}
 });
 $('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+const flipBtn=()=>`<button class="flip" data-langflip lang="${S.lang==='sw'?'en':'sw'}">${L('Read in Swahili','Soma kwa Kiingereza')}</button>`;
 function openIdea(i){const n=IDEAS.length;i=(i+n)%n;S.idea=i;const [f,en,sw,de,ds]=IDEAS[i];const lb=$('#lb');
- lb.innerHTML=`<button class="x" data-lbclose aria-label="${L('Close','Funga')}">×</button><figure><img src="/img/ideas/${f}.jpg" alt="${L(en,sw)} (sample photo)"><figcaption class="cap"><h3>${L(en,sw)}</h3><p>${L(de,ds)}</p><small>${L('Sample photo for ideas. Vincent makes similar pieces to order, in your size and colour.','Picha ya mfano tu. Vincent anatengeneza kama hii kwa oda, kwa size na rangi yako.')}</small>
+ lb.innerHTML=`<button class="x" data-lbclose aria-label="${L('Close','Funga')}">×</button><figure><img src="/img/ideas/${f}.jpg" alt="${L(en,sw)} (sample photo)"><figcaption class="cap"><div class="toprow"><h3>${L(en,sw)}</h3>${flipBtn()}</div><p>${L(de,ds)}</p><small>${L('Sample photo for ideas. Vincent makes similar pieces to order, in your size and colour.','Picha ya mfano tu. Vincent anatengeneza kama hii kwa oda, kwa size na rangi yako.')}</small>
  <div class="bar"><a class="btn b-wa" href="${wa(W(`Habari Vincent, unaweza kunitengenezea kitu kama hiki: ${sw}? (Nimeiona kwa Design ideas, mtandao wa Leo Furniture)`,`Hello Vincent, can you make something like this: ${en}?`,`\nLink: ${SITE()}/i/${f}`))}" target="_blank" rel="noopener">${L('Ask Vincent about this','Muulize Vincent kuhusu hii')}</a></div></figcaption>
  <div class="nav"><button data-lbnav="-1">← ${L('Previous','Iliyopita')}</button><button data-lbnav="1">${L('Next','Inayofuata')} →</button></div></figure>`;
  lb.hidden=false;document.body.style.overflow='hidden';lb.scrollTop=0;$('#lb .x').focus()}
