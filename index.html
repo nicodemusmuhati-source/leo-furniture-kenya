@@ -77,6 +77,11 @@ button.idea{font:inherit;text-align:left;padding:0;cursor:pointer;color:inherit}
 .card .bd{padding:12px 14px 14px;display:grid;gap:4px}
 .price{font-weight:800;white-space:nowrap}
 .muted{color:var(--soft);font-size:14px}
+.run{overflow-x:auto;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);margin:0 calc(-1*var(--side));padding:4px var(--side) 10px;-webkit-overflow-scrolling:touch}.run::-webkit-scrollbar{display:none}
+.runtrack{display:flex;gap:12px;width:max-content}
+.tile{position:relative;flex:0 0 auto;width:clamp(170px,44vw,250px);aspect-ratio:4/3;border:0;border-radius:16px;overflow:hidden;padding:0;cursor:pointer;background:#e9dccb;box-shadow:0 2px 10px #3a24140f}
+.tile img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s}.tile:hover img{transform:scale(1.05)}
+.tile b{position:absolute;left:0;right:0;bottom:0;padding:26px 12px 10px;color:#fff;font-size:16px;text-align:left;background:linear-gradient(transparent,#000a 70%)}
 .cat{padding:14px;display:grid;gap:6px;min-height:110px;align-content:end;background:var(--card);border:1px solid var(--line);border-radius:16px;color:var(--ink);text-align:left}
 .cat svg{width:56px;height:40px}
 .sec{margin:26px 0 10px;display:flex;align-items:baseline;justify-content:space-between;gap:10px}
@@ -192,7 +197,7 @@ home:()=>`<section class="hero"><img class="board" src="/img/leo-furniture-whats
  <p>${L('Wall units, kitchen cabinets, classic tables, executive couches and full interior design by Vincent and the Leo Furniture workshop.','Wall units, kabati za jikoni, meza, sofa na interior design, kutoka kwa Vincent na workshop ya Leo Furniture.')}</p>
  <div class="btns" style="margin-top:4px"><button class="btn b-acc" data-go="shop" data-all>${L('Browse furniture','Angalia fanicha')}</button><a class="btn b-wa" href="${wa(W('Habari Vincent, nimeona fanicha zako kwa mtandao wa Leo Furniture, nataka kuuliza zaidi.','Hello Vincent, I found Leo Furniture online and would like to ask about furniture.'))}" target="_blank" rel="noopener">${L('WhatsApp Vincent','WhatsApp Vincent')}</a></div></div></section>
  <div class="wrap"><div class="sec"><h2>${L('What we make','Tunachotengeneza')}</h2></div>
- <div class="cards2 cats">${CATS.map(([c])=>`<button class="cat" data-cat="${c}"><svg viewBox="40 30 240 150">${ART[c]}</svg><b>${catName(c)}</b></button>`).join('')}</div>
+ <div class="run" id="run" aria-label="${L('What we make – swipe to see more','Tunachotengeneza – swipe kuona zaidi')}"><div class="runtrack">${[0,1].map(k=>CATS.map(([c])=>`<button class="tile" data-cat="${c}" ${k?'aria-hidden="true" tabindex="-1"':''}><img src="${CATPIC[c]}" alt="" loading="lazy" decoding="async"><b>${catName(c)}</b></button>`).join('')).join('')}</div></div>
  <div class="sec"><h2>${L('Popular pieces','Fanicha maarufu')}</h2><button class="link" data-go="shop" data-all>${L('See all','Ona zote')}</button></div>
  <div class="grid">${S.products.slice(0,4).map(card).join('')}</div>
  ${S.products.length>4?`<div style="text-align:center;margin:16px 0 4px"><button class="btn b-acc" data-go="shop" data-all>${L(`See all products (${S.products.length})`,`Ona fanicha zote (${S.products.length})`)}</button></div>`:''}
@@ -256,7 +261,7 @@ contact:()=>`<div class="wrap"><h1 style="font-size:32px">${L('Talk to Vincent',
 
 function go(v,extra){Object.assign(S,{view:v},extra||{});if(v!=='manage'&&location.hash&&!(v==='item'&&location.hash.startsWith('#p=')))history.replaceState(null,'',location.pathname+location.search);render();scrollTo(0,0)}
 function render(){
- app.innerHTML=V[S.view]();tabs();
+ app.innerHTML=V[S.view]();tabs();startRun();
  const q=$('#q');if(q)q.oninput=e=>{S.q=e.target.value;S.limit=PAGE;const pos=e.target.selectionStart;render();const n=$('#q');n.focus();n.setSelectionRange(pos,pos)};
 }
 const addList=id=>{const x=S.list.find(i=>i.id===id);x?x.q++:S.list.push({id,q:1});save('leo_list',S.list);toast(L('Added to your list','Imewekwa kwa list yako'));tabs()};
@@ -288,6 +293,17 @@ document.addEventListener('submit',async e=>{
   const a=document.createElement('a');a.href=wa(m);a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove()}
 });
 $('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+const CATPIC={wall:'/img/arched-tv-wall-unit.jpg',kitchen:'/img/ideas/kitchen-cabinets-wooden-top.jpg',table:'/img/ideas/wooden-dining-set-six-chairs.jpg',coffee:'/img/classic-coffee-table-blue.jpg',couch:'/img/ideas/classic-carved-sofa.jpg',bed:'/img/ideas/solid-wooden-bed.jpg',interior:'/img/ideas/tv-wall-unit-shelves.jpg',custom:'/img/ideas/built-in-wardrobe.jpg'};
+// Auto-scrolling "What we make" strip: drifts left, pauses while touched/hovered, loops seamlessly
+let runRAF=0;
+function startRun(){cancelAnimationFrame(runRAF);const r=$('#run');if(!r)return;
+ if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+ let paused=false,resume=0,acc=0,last=0;const pause=()=>{paused=true;clearTimeout(resume)},later=()=>{clearTimeout(resume);resume=setTimeout(()=>paused=false,2500)};
+ r.addEventListener('pointerenter',pause);r.addEventListener('pointerleave',later);r.addEventListener('touchstart',pause,{passive:true});r.addEventListener('touchend',later,{passive:true});r.addEventListener('focusin',pause);r.addEventListener('focusout',later);r.addEventListener('wheel',()=>{pause();later()},{passive:true});
+ const step=t=>{if(!document.body.contains(r))return;const dt=last?Math.min(t-last,50):16;last=t;
+  if(!paused&&!document.hidden){acc+=dt*0.035;if(acc>=1){const px=Math.floor(acc);acc-=px;r.scrollLeft+=px}}
+  const half=r.scrollWidth/2;if(r.scrollLeft>=half)r.scrollLeft-=half;else if(r.scrollLeft<=0&&paused)r.scrollLeft+=half;
+  runRAF=requestAnimationFrame(step)};runRAF=requestAnimationFrame(step)}
 const flipBtn=()=>`<button class="flip" data-langflip lang="${S.lang==='sw'?'en':'sw'}">${L('Read in Swahili','Soma kwa Kiingereza')}</button>`;
 function openIdea(i){const n=IDEAS.length;i=(i+n)%n;S.idea=i;const [f,en,sw,de,ds]=IDEAS[i];const lb=$('#lb');
  lb.innerHTML=`<button class="x" data-lbclose aria-label="${L('Close','Funga')}">×</button><figure><img src="/img/ideas/${f}.jpg" alt="${L(en,sw)} (sample photo)"><figcaption class="cap"><div class="toprow"><h3>${L(en,sw)}</h3>${flipBtn()}</div><p>${L(de,ds)}</p><small>${L('Sample photo for ideas. Vincent makes similar pieces to order, in your size and colour.','Picha ya mfano tu. Vincent anatengeneza kama hii kwa oda, kwa size na rangi yako.')}</small>
