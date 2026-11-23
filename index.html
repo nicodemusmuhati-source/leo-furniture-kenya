@@ -217,7 +217,7 @@ const listCount=()=>S.list.reduce((a,x)=>a+x.q,0);
 
 function tabs(){
  const n=listCount();
- const items=[['home',L('Home','Nyumbani')],['shop',L('Shop','Duka')],['list',L('My list','List yangu')],['contact',L('Contact','Wasiliana')]];
+ const items=[['home',L('Home','Nyumbani')],['shop',L('Shop','Duka')],['list',L('My cart','Cart yangu')],['contact',L('Contact','Wasiliana')]];
  const btn=([v,l])=>`<button data-go="${v}" ${v==='shop'?'data-all':''} class="${S.view===v||(v==='shop'&&S.view==='item')?'on':''}" ${S.view===v?'aria-current="page"':''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true">${ICON[v]}</svg><span>${l}</span>${v==='list'&&n?`<span class="badge">${n}</span>`:''}</button>`;
  $('#tabs').innerHTML=items.map(btn).join('');
  $('#topnav').innerHTML=items.map(btn).join('');
@@ -263,7 +263,7 @@ item:()=>{const p=S.products.find(x=>x.id===S.item);if(!p)return V.shop();
  <span class="muted">${catName(p.cat)}</span><h1 style="font-size:32px">${esc(PN(p))}</h1>
  <span class="price" style="font-size:24px">${money(p.kes)}</span>
  <p style="margin:0">${esc(PD(p))}</p><p class="muted" style="margin:0">${L('Size','Size')}: ${esc(p.size)} · ${L('Colours, wood and fabric can be changed to your taste.','Rangi, mbao na kitambaa unachagua mwenyewe.')}</p>
- <div class="btns"><a class="btn b-wa" data-wa="${p.id}" href="${wa(msg)}" target="_blank" rel="noopener">${L('Order on WhatsApp','Order kwa WhatsApp')}</a><button class="btn b-acc" data-add="${p.id}">${L('Add to my list','Weka kwa list')}</button></div>
+ <div class="btns"><a class="btn b-wa" data-wa="${p.id}" href="${wa(msg)}" target="_blank" rel="noopener">${L('Order on WhatsApp','Order kwa WhatsApp')}</a><button class="btn b-acc" data-add="${p.id}">${L('Add to cart','Weka kwa cart')}</button></div>
  <div class="panel"><h3>${L('How to pay with M-Pesa','Jinsi ya kulipa na M-Pesa')}</h3><ol class="steps">${L(
   `<li>Agree the final price and delivery cost with Vincent on WhatsApp first.</li><li>Open M-PESA → <b>Send Money</b>.</li><li>Enter <b style="white-space:nowrap">${MPESA}</b> (Vincent, Leo Furniture).</li><li>Enter the agreed amount and your PIN.</li><li>Send the M-Pesa confirmation message to Vincent on WhatsApp.</li>`,
   `<li>Kwanza ongea na Vincent kwa WhatsApp mkubaliane bei ya mwisho na bei ya delivery.</li><li>Fungua M-PESA → <b>Send Money</b>.</li><li>Weka namba <b style="white-space:nowrap">${MPESA}</b> (Vincent, Leo Furniture).</li><li>Weka kiasi mlichokubaliana na PIN yako.</li><li>Mtumie Vincent ujumbe wa uthibitisho wa M-Pesa kwenye WhatsApp.</li>`)}</ol></div>
@@ -274,12 +274,12 @@ list:()=>{const rows=S.list.map(x=>({...x,p:S.products.find(p=>p.id===x.id)})).f
  const items=rows.map(x=>`• ${x.q} × ${x.p.name_sw||x.p.name}${SHOW_PRICES&&x.p.kes?` (${KES(x.p.kes)})`:''}\n   ${pLink(x.p)}`).join('\n');
  const en=S.lang!=='sw', b=(sw,e)=>en?`${sw} / ${e}`:sw;
  const msg=W('Habari Vincent, nataka ku-order kutoka Leo Furniture:','Hello Vincent, I would like to order from Leo Furniture:')+'\n'+items+(SHOW_PRICES&&tot?`\n${b('Total ya makadirio','Estimated total')}: ${KES(tot)}${quote?b(' + zingine za kuuliza bei',' + items to quote'):''}`:'\n'+b('Tafadhali nitumie bei.','Please send me the prices.'))+'\n'+b('Jina na town yangu','My name and town')+': ';
- return `<div class="wrap"><h1 style="font-size:32px">${L('My list','List yangu')}</h1>
+ return `<div class="wrap"><h1 style="font-size:32px">${L('My cart','Cart yangu')}</h1>
  ${rows.length?`<div class="panel">${rows.map(x=>`<div class="row"><div><b>${esc(PN(x.p))}</b><div class="muted">${money(x.p.kes)}</div></div><div class="qty"><button data-q="${x.id}" data-d="-1" aria-label="${L('Less','Punguza')}">−</button><b>${x.q}</b><button data-q="${x.id}" data-d="1" aria-label="${L('More','Ongeza')}">+</button></div></div>`).join('')}
  ${SHOW_PRICES?`<div class="row"><b>${L('Estimated total','Total ya makadirio')}</b><span class="price">${money(tot)}${quote?' + …':''}</span></div>`:''}</div>
  <p class="muted">${L('Delivery cost depends on your town and is confirmed by Vincent.','Bei ya delivery inategemea town yako, Vincent atakuambia.')}</p>
- <div class="btns"><a class="btn b-wa" data-walist href="${wa(msg)}" target="_blank" rel="noopener">${L('Send order on WhatsApp','Tuma oda kwa WhatsApp')}</a><button class="btn b-ghost" data-clear>${L('Clear list','Futa list')}</button></div>`
- :`<div class="panel"><b>${L('Your list is empty.','List yako iko empty.')}</b><p class="muted" style="margin:4px 0 12px">${L('Add pieces you like, then send them all to Vincent in one WhatsApp message.','Weka fanicha unazopenda, halafu umtumie Vincent zote kwa message moja ya WhatsApp.')}</p><button class="btn b-wal" data-go="shop">${L('Browse furniture','Angalia fanicha')}</button></div>`}</div>`},
+ <div class="btns"><a class="btn b-wa" data-walist href="${wa(msg)}" target="_blank" rel="noopener">${L('Send order on WhatsApp','Tuma oda kwa WhatsApp')}</a><button class="btn b-ghost" data-clear>${L('Clear cart','Futa cart')}</button></div>`
+ :`<div class="panel"><b>${L('Your cart is empty.','Cart yako iko empty.')}</b><p class="muted" style="margin:4px 0 12px">${L('Add pieces you like, then send them all to Vincent in one WhatsApp message.','Weka fanicha unazopenda, halafu umtumie Vincent zote kwa message moja ya WhatsApp.')}</p><button class="btn b-wal" data-go="shop">${L('Browse furniture','Angalia fanicha')}</button></div>`}</div>`},
 
 contact:()=>`<div class="wrap"><h1 style="font-size:32px">${L('Talk to Vincent','Ongea na Vincent')}</h1>
  <div class="panel" style="display:grid;gap:10px"><p style="margin:0">${L('For orders, custom designs, interior design and delivery quotes, call or WhatsApp:','Kwa oda, design yako mwenyewe, interior design au bei ya delivery, piga simu ama tuma WhatsApp:')}</p>
@@ -302,7 +302,7 @@ function render(){
  app.innerHTML=V[S.view]();tabs();startRun();setHH();
  const q=$('#q');if(q)q.oninput=e=>{S.q=e.target.value;S.limit=PAGE;const pos=e.target.selectionStart;render();const n=$('#q');n.focus();n.setSelectionRange(pos,pos)};
 }
-const addList=id=>{const x=S.list.find(i=>i.id===id);x?x.q++:S.list.push({id,q:1});save('leo_list',S.list);toast(L('Added to your list','Imewekwa kwa list yako'));tabs()};
+const addList=id=>{const x=S.list.find(i=>i.id===id);x?x.q++:S.list.push({id,q:1});save('leo_list',S.list);toast(L('Added to your cart','Imewekwa kwa cart yako'));tabs()};
 function modal(html){$('#mbody').innerHTML=html;$('#modal').classList.add('show')}
 const closeModal=()=>$('#modal').classList.remove('show');
 
