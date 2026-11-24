@@ -66,6 +66,16 @@ button{cursor:pointer}
 .chip.on{background:var(--wal);color:#fff;border-color:var(--wal)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:14px}
 .toprow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.lb .toprow h3{margin:0}.flip{border:1.5px solid #7a4a2a;background:#fff;color:#5a3920;border-radius:999px;padding:7px 14px;min-height:38px;font:inherit;font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap}.flip:hover{background:#f6efe6}
+.gal{position:relative;border-radius:18px;overflow:hidden;background:#ece5dc}
+.gtrack{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch}.gtrack::-webkit-scrollbar{display:none}
+.gslide{flex:0 0 100%;scroll-snap-align:center;aspect-ratio:4/3}.gslide img{width:100%;height:100%;object-fit:contain;display:block;background:#ece5dc}
+.garr{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;border:0;background:#3a2416cc;color:#fff;font-size:26px;line-height:1;cursor:pointer;display:grid;place-items:center}
+.gprev{left:8px}.gnext{right:8px}
+.gcount{position:absolute;left:10px;top:10px;background:#3a2416d9;color:#fff6e8;font-size:12.5px;font-weight:700;padding:4px 10px;border-radius:999px}
+.gdots{position:absolute;left:0;right:0;bottom:8px;display:flex;justify-content:center;gap:6px}.gdots button{width:10px;height:10px;border-radius:50%;border:1.5px solid #3a2416;background:#fff;padding:0;cursor:pointer}.gdots button.on{background:#e0a54f;border-color:#e0a54f}
+.detail .pic{position:relative}
+.card .pic{position:relative}.pbadge{position:absolute;right:8px;bottom:8px;background:#3a2416d9;color:#fff6e8;font-size:12px;font-weight:700;padding:3px 8px;border-radius:999px}
+.xph{display:flex;flex-wrap:wrap;gap:8px}.xph figure{position:relative;margin:0;width:86px;height:68px;border-radius:8px;overflow:hidden;background:#ece5dc}.xph img{width:100%;height:100%;object-fit:cover}.xph button{position:absolute;top:2px;right:2px;width:24px;height:24px;border-radius:50%;border:0;background:#8b1d1dcc;color:#fff;font-size:14px;line-height:1;cursor:pointer}
 .lb{position:fixed;inset:0;z-index:60;background:#120c08f2;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px;overflow:auto}.lb[hidden]{display:none}
 .lb figure{margin:0;max-width:1000px;width:100%;display:grid;gap:12px}.lb img{width:100%;max-height:68vh;object-fit:contain;border-radius:12px;background:#000}
 .lb .cap{background:#fff;border-radius:12px;padding:14px 16px;color:#2a1d14}.lb .cap h3{margin:0 0 6px;font-size:19px}.lb .cap p{margin:0 0 6px;line-height:1.5}.lb .cap small{color:#7a6a5c}
@@ -223,11 +233,16 @@ const SITE=()=>location.origin;
 const pLink=p=>`${SITE()}/p/${encodeURIComponent(p.id)}`;
 const wa=t=>`https://wa.me/${PHONE}?text=${encodeURIComponent(t)}`;
 const toast=t=>{const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2200)};
+const contactMsg=()=>W(`Habari Vincent, nimeona Leo Furniture kwa mtandao wa Leo Furniture (leofurniture.co.ke). Ningependa kuuliza kuhusu:
+• Fanicha iliyoko kwa Showroom
+• Design niliyoona kwa Chagua Designs
+• Kitu cha oda (design yangu mwenyewe)
+Tafadhali nisaidie na bei na delivery.`,`Hello Vincent, I found Leo Furniture online. I would like to ask about a showroom piece, a design I saw, or a custom order. Please help me with prices and delivery.`,S.lang==='sw'?`\nNaitwa: \nTown yangu: \nNinachotaka: `:`\nNaitwa / My name: \nTown yangu / My town: \nNinachotaka / What I want: `);
 const prodMsg=p=>{const pr=SHOW_PRICES&&p.kes?` (${KES(p.kes)})`:'';return W(`Hello Vincent, nimependezwa na ${p.name_sw||p.name}${pr} kwa mtandao wa Leo Furniture. Tafadhali nitumie details na bei ya delivery hadi town yangu.`,`Hello Vincent, I am interested in the ${p.name}${pr}. Please send details and the delivery cost to my town.`,`\n${S.lang==='sw'?'Link':'Link'}: ${pLink(p)}`+(S.lang==='sw'?'\nTown yangu: ':'\nTown yangu / My town: '))};
 const inCart=id=>(S.list.find(i=>i.id===id)||{}).q||0;
 const cartBtn=id=>{const n=inCart(id);return `<button class="btn addc ${n?'in':''}" data-add="${id}" aria-label="${L('Add to cart','Weka kwa cart')}">${CARTSVG}<span>${n?L(`In cart (${n}) · Add 1 more`,`Iko kwa cart (${n}) · Ongeza 1`):L('Add to cart','Weka kwa cart')}</span></button>`};
 const CARTSVG='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L20 8H6.2"/><circle cx="9.5" cy="19.5" r="1.3"/><circle cx="17" cy="19.5" r="1.3"/></svg>';
-const card=p=>`<div class="card"><button class="cardlink" data-item="${p.id}"><div class="pic">${pic(p)}</div><div class="bd"><span class="muted">${catName(p.cat)}</span><h3>${esc(PN(p))}</h3><span class="price">${money(p.kes)}</span>${starsLine(p.id)}</div></button><div class="cardfoot">${cartBtn(p.id)}<a class="btn b-wa waic" data-wa="${p.id}" href="${wa(prodMsg(p))}" target="_blank" rel="noopener" aria-label="${L('Ask Vincent on WhatsApp','Muulize Vincent kwa WhatsApp')}" title="${L('Ask Vincent on WhatsApp','Muulize Vincent kwa WhatsApp')}"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.8-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg></a></div></div>`;
+const card=p=>`<div class="card"><button class="cardlink" data-item="${p.id}"><div class="pic">${pic(p)}${p.pics?`<span class="pbadge">📷 ${p.pics+1}</span>`:''}</div><div class="bd"><span class="muted">${catName(p.cat)}</span><h3>${esc(PN(p))}</h3><span class="price">${money(p.kes)}</span>${starsLine(p.id)}</div></button><div class="cardfoot">${cartBtn(p.id)}<a class="btn b-wa waic" data-wa="${p.id}" href="${wa(prodMsg(p))}" target="_blank" rel="noopener" aria-label="${L('Ask Vincent on WhatsApp','Muulize Vincent kwa WhatsApp')}" title="${L('Ask Vincent on WhatsApp','Muulize Vincent kwa WhatsApp')}"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.8-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg></a></div></div>`;
 const listCount=()=>S.list.reduce((a,x)=>a+x.q,0);
 
 function tabs(){
@@ -273,7 +288,7 @@ shop:()=>{const q=S.q.toLowerCase();const ps=S.products.filter(p=>(S.cat==='all'
 item:()=>{const p=S.products.find(x=>x.id===S.item);if(!p)return V.shop();
  const msg=prodMsg(p);
  return `<div class="wrap"><div class="toprow"><button class="link" data-go="shop" style="padding-left:0">${L('← Back to shop','← Rudi kwa Duka')}</button>${flipBtn()}</div>
- <div class="detail"><div class="pic">${pic(p)}</div><div style="display:grid;gap:12px;align-content:start">
+ <div class="detail">${gallery(p)}<div style="display:grid;gap:12px;align-content:start">
  <span class="muted">${catName(p.cat)}</span><h1 style="font-size:32px">${esc(PN(p))}</h1>
  <span class="price" style="font-size:24px">${money(p.kes)}</span>
  <p style="margin:0">${esc(PD(p))}</p><p class="muted" style="margin:0">${L('Size','Size')}: ${esc(p.size)} · ${L('Colours, wood and fabric can be changed to your taste.','Rangi, mbao na kitambaa unachagua mwenyewe.')}</p>
@@ -298,7 +313,7 @@ list:()=>{const rows=S.list.map(x=>({...x,p:S.products.find(p=>p.id===x.id)})).f
 contact:()=>`<div class="wrap"><h1 style="font-size:32px">${L('Talk to Vincent','Ongea na Vincent')}</h1>
  <div class="panel" style="display:grid;gap:10px"><p style="margin:0">${L('For orders, custom designs, interior design and delivery quotes, call or WhatsApp:','Kwa oda, design yako mwenyewe, interior design au bei ya delivery, piga simu ama tuma WhatsApp:')}</p>
  <p class="price" style="font-size:22px;margin:0">+254 729 754 199</p>
- <div class="btns"><a class="btn b-wa" href="${wa('Habari Vincent, ')}" target="_blank" rel="noopener">WhatsApp</a><a class="btn b-wal" href="tel:+254729754199">${L('Call','Piga simu')}</a><a class="btn b-wal" href="mailto:vincent@leofurniture.co.ke?subject=${encodeURIComponent(L('Furniture enquiry – Leo Furniture','Swali kuhusu fanicha – Leo Furniture'))}">${L('Email','Tuma email')}</a></div>
+ <div class="btns"><a class="btn b-wa" href="${wa(contactMsg())}" target="_blank" rel="noopener">WhatsApp</a><a class="btn b-wal" href="tel:+254729754199">${L('Call','Piga simu')}</a><a class="btn b-wal" href="mailto:vincent@leofurniture.co.ke?subject=${encodeURIComponent(L('Furniture enquiry – Leo Furniture','Swali kuhusu fanicha – Leo Furniture'))}">${L('Email','Tuma email')}</a></div>
  <p style="margin:2px 0 10px">✉️ <a href="mailto:vincent@leofurniture.co.ke" style="font-weight:700">vincent@leofurniture.co.ke</a></p>
  <p class="note" style="margin:0">${L(`M-Pesa payments: Send Money to ${MPESA}. Workshop: Serem Town, Nandi County.`,`M-Pesa: Send Money kwa ${MPESA}. Workshop: Serem Town, Nandi County.`)}</p></div>
  <div class="sec"><h2>${L('Request a custom piece or interior design','Omba fanicha ya oda au interior design')}</h2></div>
@@ -314,7 +329,7 @@ contact:()=>`<div class="wrap"><h1 style="font-size:32px">${L('Talk to Vincent',
 
 function go(v,extra){Object.assign(S,{view:v},extra||{});if(v!=='manage'&&location.hash&&!(v==='item'&&location.hash.startsWith('#p=')))history.replaceState(null,'',location.pathname+location.search);render();scrollTo(0,0)}
 function render(){
- app.innerHTML=V[S.view]();tabs();startRun();setHH();
+ app.innerHTML=V[S.view]();tabs();startRun();setHH();gWire();
  const q=$('#q');if(q)q.oninput=e=>{S.q=e.target.value;S.limit=PAGE;const pos=e.target.selectionStart;render();const n=$('#q');n.focus();n.setSelectionRange(pos,pos)};
 }
 const addList=id=>{const x=S.list.find(i=>i.id===id);x?x.q++:S.list.push({id,q:1});save('leo_list',S.list);toast(L('Added to your cart','Imewekwa kwa cart yako'));tabs()};
@@ -323,6 +338,8 @@ const closeModal=()=>$('#modal').classList.remove('show');
 
 document.addEventListener('click',e=>{
  const t=e.target.closest('button,a');if(!t)return;const d=t.dataset;
+ if(d.gnav){const t=$('#gtrack');if(t)gGo(Math.round(t.scrollLeft/t.clientWidth)+(+d.gnav));return}
+ if(d.gdot!==undefined){gGo(+d.gdot);return}
  if('langflip' in d){S.lang=S.lang==='sw'?'en':'sw';save('leo_lang',S.lang);render();if(!$('#lb').hidden)openIdea(S.idea);return}
  if('idea' in d){openIdea(+d.idea);return}
  if('lbclose' in d){closeIdea();return}
@@ -377,6 +394,18 @@ $('#jumpmenu').addEventListener('click',e=>{const b=e.target.closest('[data-jump
  document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'})});
 document.addEventListener('click',e=>{if(!e.target.closest('#jump'))closeJump()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeJump()});
+S.photos={};
+const loadPhotos=async pid=>{if(!fb||S.photos[pid])return;S.photos[pid]='loading';try{const sn=await getDocs(query(collection(fb.db,'photos'),where('pid','==',pid)));S.photos[pid]=sn.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.order||0)-(b.order||0))}catch(e){S.photos[pid]=[]}if(S.view==='item'&&S.item===pid)render();else if(S.view==='manage'&&S.editing===pid){const l=$('#xph');if(l)l.innerHTML=extraRows(pid)}};
+const allPics=p=>[p.img,...(Array.isArray(S.photos[p.id])?S.photos[p.id].map(x=>x.img):[])].filter(Boolean);
+const gallery=p=>{if(fb&&p.pics&&!S.photos[p.id])loadPhotos(p.id);const imgs=allPics(p);
+ if(imgs.length<2)return `<div class="pic">${pic(p)}${p.pics&&S.photos[p.id]==='loading'?`<span class="gcount">${L('Loading more photos…','Picha zaidi zinakuja…')}</span>`:''}</div>`;
+ const alt=esc(PN(p));
+ return `<div class="gal" data-n="${imgs.length}"><div class="gtrack" id="gtrack">${imgs.map((u,i)=>`<div class="gslide"><img src="${u}" alt="${alt} – ${L('photo','picha')} ${i+1}" ${i?'loading="lazy"':''} decoding="async"></div>`).join('')}</div>
+ <button class="garr gprev" data-gnav="-1" aria-label="${L('Previous photo','Picha iliyopita')}">‹</button><button class="garr gnext" data-gnav="1" aria-label="${L('Next photo','Picha inayofuata')}">›</button>
+ <span class="gcount" id="gcount">1 / ${imgs.length} · ${L('swipe to see more','swipe kuona zaidi')}</span>
+ <div class="gdots">${imgs.map((_,i)=>`<button data-gdot="${i}" class="${i?'':'on'}" aria-label="${L('Photo','Picha')} ${i+1}"></button>`).join('')}</div></div>`};
+const gWire=()=>{const t=$('#gtrack');if(!t)return;const n=t.children.length;t.onscroll=()=>{const i=Math.round(t.scrollLeft/t.clientWidth);const c=$('#gcount');if(c)c.textContent=`${i+1} / ${n}`;document.querySelectorAll('.gdots button').forEach((b,k)=>b.classList.toggle('on',k===i))}};
+const gGo=i=>{const t=$('#gtrack');if(!t)return;const n=t.children.length;i=(i+n)%n;t.scrollTo({left:i*t.clientWidth,behavior:'smooth'})};
 const flipBtn=()=>`<button class="flip" data-langflip lang="${S.lang==='sw'?'en':'sw'}">${L('Read in Swahili','Soma kwa Kiingereza')}</button>`;
 function openIdea(i){const n=IDEAS.length;i=(i+n)%n;S.idea=i;const [f,en,sw,de,ds]=IDEAS[i];const lb=$('#lb');
  lb.innerHTML=`<button class="x" data-lbclose aria-label="${L('Close','Funga')}">×</button><figure><img src="/img/ideas/${f}.jpg" alt="${L(en,sw)} (sample photo)"><figcaption class="cap"><div class="toprow"><h3>${L(en,sw)}</h3>${flipBtn()}</div><p>${L(de,ds)}</p><small>${L('Sample photo for ideas. Vincent makes similar pieces to order, in your size and colour.','Picha ya mfano tu. Vincent anatengeneza kama hii kwa oda, kwa size na rangi yako.')}</small>
@@ -448,7 +477,8 @@ async function loadSecurity(){
 }
 
 const missingStarters=()=>S.remote===0?DEF.slice():DEF.filter(d=>!S.products.some(p=>p.id===d.id));
-const prodRows=()=>S.products.map(p=>`<div class="row"><div><b>${esc(p.name)}</b><div class="muted">${catName(p.cat)}${p.kes?' · KES '+Number(p.kes).toLocaleString('en-KE'):''}</div></div><div class="btns"><button class="btn b-ghost" data-pedit="${p.id}" style="min-height:40px">Edit</button><button class="btn b-ghost" data-pdel="${p.id}" style="min-height:40px">Delete</button></div></div>`).join('')||'<p class="muted">No products yet.</p>';
+const extraRows=pid=>{const a=S.photos[pid];if(a==='loading')return '<span class="muted">Loading extra photos…</span>';if(!Array.isArray(a)||!a.length)return '';return '<span class="muted" style="flex-basis:100%">Extra photos (tap × to remove):</span>'+a.map(x=>`<figure><img src="${x.img}" alt=""><button type="button" data-xdel="${x.id}" data-xpid="${pid}" aria-label="Remove photo">×</button></figure>`).join('')};
+const prodRows=()=>S.products.map(p=>`<div class="row"><div><b>${esc(p.name)}</b><div class="muted">${catName(p.cat)}${p.kes?' · KES '+Number(p.kes).toLocaleString('en-KE'):''}${p.pics?' · '+(p.pics+1)+' photos':''}</div></div><div class="btns"><button class="btn b-ghost" data-pedit="${p.id}" style="min-height:40px">Edit</button><button class="btn b-ghost" data-pdel="${p.id}" style="min-height:40px">Delete</button></div></div>`).join('')||'<p class="muted">No products yet.</p>';
 
 const secHTML=()=>`<div class="sec"><h2>Security</h2></div>
  <div class="panel" style="display:grid;gap:10px">
@@ -484,7 +514,9 @@ V.manage=()=>{
    <label style="display:flex;align-items:center;gap:10px;font-weight:400"><input type="radio" name="pmode" value="set" style="width:22px;height:22px">Show this price</label>
    <label>Price in KES<input name="kes" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g. 45,000" disabled></label>
   </fieldset>
-  <label>Photo<input name="img" type="file" accept="image/*"></label>
+  <label>Main photo<input name="img" type="file" accept="image/*"></label>
+  <label>More photos: other sides and angles <span class="muted">(optional, you can pick several)</span><input name="more" type="file" accept="image/*" multiple></label>
+  <div id="xph" class="xph"></div>
   <p class="note" id="aihint" style="margin:0">Choose a photo first: the name, category and description will be suggested for you. Then add the price.</p>
   <button type="button" class="link" data-aiagain hidden style="justify-self:start;padding-left:0">Suggest again from this photo</button>
   <div class="btns"><button class="btn b-acc">Save product</button><button type="button" class="btn b-ghost" data-pnew>Clear form</button></div></form>
@@ -502,10 +534,11 @@ document.addEventListener('click',async e=>{
  try{
   if('gin' in d){await signInWithPopup(fb.auth,new GoogleAuthProvider())}
   else if('sout' in d){await signOut(fb.auth);S.editing=null;render()}
-  else if('pnew' in d){S.editing=null;$('#pf').reset();$('#pf').pid.value='';$('#ft').textContent='Add a product'}
-  else if(d.pedit){const p=S.products.find(x=>x.id===d.pedit),f=$('#pf');S.editing=p.id;f.pid.value=p.id;f.name.value=p.name;f.cat.value=p.cat;f.size.value=p.size||'';f.desc.value=p.desc||'';f.name_sw.value=p.name_sw||'';f.desc_sw.value=p.desc_sw||'';setPriceForm(f,p.kes||0);$('#ft').textContent='Edit: '+p.name;f.scrollIntoView({behavior:'smooth'})}
+  else if('pnew' in d){S.editing=null;$('#xph').innerHTML='';$('#pf').reset();$('#pf').pid.value='';$('#ft').textContent='Add a product'}
+  else if(d.pedit){const p=S.products.find(x=>x.id===d.pedit),f=$('#pf');S.editing=p.id;f.pid.value=p.id;f.name.value=p.name;f.cat.value=p.cat;f.size.value=p.size||'';f.desc.value=p.desc||'';f.name_sw.value=p.name_sw||'';f.desc_sw.value=p.desc_sw||'';setPriceForm(f,p.kes||0);$('#ft').textContent='Edit: '+p.name;delete S.photos[p.id];$('#xph').innerHTML='';loadPhotos(p.id);f.scrollIntoView({behavior:'smooth'})}
   else if(d.pdel){const p=S.products.find(x=>x.id===d.pdel);modal(`<h2>Delete ${esc(p.name)}?</h2><p class="muted">Customers will no longer see it.</p><div class="btns"><button class="btn b-wal" data-preally="${p.id}">Delete</button><button class="btn b-ghost" data-close>Keep</button></div>`)}
-  else if(d.preally){const p=S.products.find(x=>x.id===d.preally);closeModal();await deleteDoc(doc(fb.db,'products',d.preally));logAct('deleted',p&&p.name);toast('Product deleted')}
+  else if(d.xdel){if(!confirm('Remove this photo?'))return;await deleteDoc(doc(fb.db,'photos',d.xdel));const pid=d.xpid,p=S.products.find(x=>x.id===pid);S.photos[pid]=(S.photos[pid]||[]).filter(x=>x.id!==d.xdel);if(p)await setDoc(doc(fb.db,'products',pid),{pics:S.photos[pid].length,updatedAt:serverTimestamp(),updatedBy:S.user.uid},{merge:true});$('#xph').innerHTML=extraRows(pid);logAct('removed a photo from',p&&p.name);toast('Photo removed')}
+  else if(d.preally){const p=S.products.find(x=>x.id===d.preally);closeModal();try{const sn=await getDocs(query(collection(fb.db,'photos'),where('pid','==',d.preally)));for(const x of sn.docs)await deleteDoc(x.ref)}catch(x){}await deleteDoc(doc(fb.db,'products',d.preally));logAct('deleted',p&&p.name);toast('Product deleted')}
   else if('seed' in d){busy(true);for(const p of missingStarters()){const {id,...rest}=p;await setDoc(doc(fb.db,'products',id),{...rest,order:DEF.indexOf(p)+1,updatedAt:serverTimestamp(),updatedBy:S.user.uid})}logAct('restored original products');busy(false);toast('Original photos restored')}
   else if('pintoggle' in d){await setDoc(doc(fb.db,'config','security'),{pinLoginEnabled:!S.pinOn});logAct(S.pinOn?'paused PIN logins':'turned PIN logins on');await loadSecurity();toast(S.pinOn?'PIN logins are on':'All PIN logins paused')}
   else if(d.eact){await setDoc(doc(fb.db,'editors',d.eact),{active:d.on==='1'},{merge:true});await loadSecurity();toast(d.on==='1'?'Login activated':'Login paused')}
@@ -520,9 +553,11 @@ document.addEventListener('submit',async e=>{
    const id=f.pid.value||('p'+Date.now().toString(36)),old=S.products.find(p=>p.id===id&&f.pid.value);
    let img=old&&old.img||'';if(f.img.files[0])img=await shrink(f.img.files[0]);
    if((!f.name_sw.value.trim()||!f.desc_sw.value.trim())&&f.name.value.trim()){try{const t=await translateSw(f.name.value,f.desc.value);if(!f.name_sw.value.trim())f.name_sw.value=t.name_sw||'';if(!f.desc_sw.value.trim())f.desc_sw.value=t.description_sw||''}catch(x){}}
-   const data={name:f.name.value.trim(),name_sw:f.name_sw.value.trim().slice(0,80),desc_sw:f.desc_sw.value.trim().slice(0,600),cat:f.cat.value,desc:f.desc.value.trim(),size:f.size.value.trim(),kes:priceFromForm(f),img,order:old&&typeof old.order==='number'?old.order:-Date.now(),updatedAt:serverTimestamp(),updatedBy:S.user.uid};
+   let pics=old&&old.pics||0;const nf=[...(f.more.files||[])].slice(0,8);
+   if(nf.length){toast(`Uploading ${nf.length} extra photo${nf.length>1?'s':''}…`);if(!Array.isArray(S.photos[id]))S.photos[id]=[];let o=S.photos[id].length;for(const file of nf){const u=await shrink(file);const r=await addDoc(collection(fb.db,'photos'),{pid:id,img:u,order:++o,updatedAt:serverTimestamp(),updatedBy:S.user.uid});S.photos[id].push({id:r.id,img:u,order:o})}pics=S.photos[id].length}
+   const data={pics,name:f.name.value.trim(),name_sw:f.name_sw.value.trim().slice(0,80),desc_sw:f.desc_sw.value.trim().slice(0,600),cat:f.cat.value,desc:f.desc.value.trim(),size:f.size.value.trim(),kes:priceFromForm(f),img,order:old&&typeof old.order==='number'?old.order:-Date.now(),updatedAt:serverTimestamp(),updatedBy:S.user.uid};
    await setDoc(doc(fb.db,'products',id),data);logAct(old?'edited':'added',data.name);
-   S.editing=null;f.reset();f.pid.value='';$('#ft').textContent='Add a product';toast(old?'Product updated':'Product added')}
+   S.editing=null;f.reset();f.pid.value='';$('#xph').innerHTML='';$('#ft').textContent='Add a product';toast(old?'Product updated':'Product added')}
   else if(f.id==='nf'){
    if(f.p.value!==f.p2.value)throw {code:'x',m:'The two PINs do not match.'};
    const u='owner'+Date.now().toString(36),sec=initializeApp(CFG,'sec'+Date.now()),sa=getAuth(sec);
