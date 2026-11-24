@@ -2,7 +2,7 @@
 // The Firebase web API key below is a public identifier (it is already in index.html); product reads are public in the Firestore rules.
 export const PROJECT = 'leo-furniture-d0b59';
 export const KEY = 'AIzaSyDH0sjRmWis7xKO7X2DQgGpDutXG5Qx1SA';
-export const BOARD = '/img/leo-furniture-whatsapp-preview-v5.jpg';
+export const BOARD = '/img/leo-furniture-whatsapp-preview-v6.jpg';
 export const STARTERS = {
   r1: { name: 'Arched TV wall unit', img: '/img/arched-tv-wall-unit.jpg' },
   r2: { name: 'Floral glass wall unit', img: '/img/floral-glass-wall-unit.jpg' },
@@ -31,7 +31,7 @@ export function page({ origin, url, title, desc, image, alt, go }) {
 <meta property="og:url" content="${esc(url)}">
 <meta property="og:image" content="${esc(image)}"><meta property="og:image:secure_url" content="${esc(image)}"><meta property="og:image:alt" content="${esc(alt)}">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="/img/leo-furniture-icon.png">
+<link rel="icon" href="/img/leo-furniture-icon-v2.png">
 <meta http-equiv="refresh" content="0;url=${esc(go)}">
 <script>location.replace(${JSON.stringify(go)})</script>
 </head><body style="font-family:system-ui;background:#f6efe6;color:#2a1d14;padding:24px">
