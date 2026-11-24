@@ -2,7 +2,7 @@
 // The Firebase web API key below is a public identifier (it is already in index.html); product reads are public in the Firestore rules.
 export const PROJECT = 'leo-furniture-d0b59';
 export const KEY = 'AIzaSyDH0sjRmWis7xKO7X2DQgGpDutXG5Qx1SA';
-export const BOARD = '/img/leo-furniture-whatsapp-preview-v6.jpg';
+export const BOARD = '/img/leo-furniture-whatsapp-preview-v7.jpg';
 export const STARTERS = {
   r1: { name: 'Arched TV wall unit', img: '/img/arched-tv-wall-unit.jpg' },
   r2: { name: 'Floral glass wall unit', img: '/img/floral-glass-wall-unit.jpg' },
